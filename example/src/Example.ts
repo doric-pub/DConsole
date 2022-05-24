@@ -10,11 +10,16 @@ import {
   modal,
   AssetsResource,
   image,
+  log,
 } from "doric";
 import { demoPlugin } from "dconsole";
+import { openDConsole } from "./dConsole";
 
 @Entry
 class Example extends Panel {
+  onCreate() {
+    openDConsole(this.context);
+  }
   onShow() {
     navbar(context).setTitle("Example");
   }
@@ -29,8 +34,7 @@ class Example extends Panel {
         backgroundColor: Color.parse("#70a1ff"),
         textColor: Color.WHITE,
         onClick: async () => {
-          const result = await demoPlugin(this.context).call();
-          await modal(this.context).alert(result);
+          log("Hello,Console");
         },
         layoutConfig: layoutConfig().fit(),
         padding: { left: 20, right: 20, top: 20, bottom: 20 },
