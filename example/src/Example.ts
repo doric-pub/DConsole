@@ -11,6 +11,8 @@ import {
   AssetsResource,
   image,
   log,
+  loge,
+  logw,
 } from "doric";
 import { demoPlugin } from "dconsole";
 import { openDConsole } from "./dConsole";
@@ -35,6 +37,8 @@ class Example extends Panel {
         textColor: Color.WHITE,
         onClick: async () => {
           log("Hello,Console");
+          logw("Hello,Console");
+          loge("Hello,Console");
         },
         layoutConfig: layoutConfig().fit(),
         padding: { left: 20, right: 20, top: 20, bottom: 20 },

@@ -1,10 +1,22 @@
-import { Color, jsx, createRef, Group, Text, Panel } from "doric";
+import {
+  Color,
+  jsx,
+  createRef,
+  Group,
+  Panel,
+  List,
+  layoutConfig,
+  ListItem,
+  Text,
+  Gravity,
+  Stack,
+} from "doric";
 import { DCModule } from "./dcModule";
 
 type LogModel = { type: "d" | "w" | "e"; message: string }[];
 
 export class LogModule extends DCModule<LogModel> {
-  contentRef = createRef<Text>();
+  listRef = createRef<List>();
   title() {
     return "Log";
   }
@@ -13,7 +25,11 @@ export class LogModule extends DCModule<LogModel> {
   }
   build(group: Group) {
     group.backgroundColor = Color.RED;
-    <Text ref={this.contentRef} parent={group}></Text>;
+    <List
+      ref={this.listRef}
+      parent={group}
+      layoutConfig={layoutConfig().most()}
+    />;
   }
   onAttached(state: LogModel) {
     const panel = context.entity as Panel;
@@ -39,8 +55,34 @@ export class LogModule extends DCModule<LogModel> {
       global["nativeLog"] = nativeLog;
       Reflect.apply(originDestroy, panel, []);
     };
+    this.listRef.current.renderItem = (i) => {
+      return (
+        <ListItem layoutConfig={layoutConfig().mostWidth().fitHeight()}>
+          <Text
+            layoutConfig={layoutConfig().mostWidth().fitHeight()}
+            padding={{ left: 5, top: 5, right: 5, bottom: 5 }}
+            textColor={
+              state[i].type === "e"
+                ? Color.parse("#e74c3c")
+                : state[i].type === "w"
+                ? Color.parse("#f1c40f")
+                : Color.BLACK
+            }
+            textAlignment={Gravity.CenterY.left()}
+            textSize={12}
+          >
+            {state[i].message}
+          </Text>
+          <Stack
+            layoutConfig={layoutConfig().mostWidth().justHeight()}
+            height={0.5}
+            backgroundColor={Color.parse("#bdc3c7")}
+          />
+        </ListItem>
+      ) as ListItem;
+    };
   }
   onBind(state: LogModel) {
-    this.contentRef.current.text = state.length + "";
+    this.listRef.current.itemCount = state.length;
   }
 }

@@ -67,6 +67,7 @@ class DCVH extends ViewHolder {
           height={300}
           ref={this.contentRef}
           backgroundColor={Color.WHITE}
+          onClick={() => {}}
         />
       </VLayout>
     </Stack>;
