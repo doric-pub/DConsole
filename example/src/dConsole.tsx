@@ -19,18 +19,25 @@ import {
   ViewHolder,
   Group,
   ViewModel,
-  log,
+  ClassType,
+  View,
 } from "doric";
-import { loge } from "doric/lib/src/util/log";
+import { DCModule } from "./module/dcModule";
+import { ElementModule } from "./module/ElementModule";
+import { LogModule } from "./module/LogModule";
+
+const DCM: ClassType<DCModule<any>>[] = [LogModule, ElementModule];
 
 type DCModel = {
   show: boolean;
-  logRecords: { type: "d" | "w" | "e"; message: string }[];
+  selectedModule: DCModule<any>;
+  dcModules: DCModule<any>[];
 };
 
 class DCVH extends ViewHolder {
   containerRef = createRef<Stack>();
-  contentRef = createRef<Text>();
+  tabRef = createRef<HLayout>();
+  contentRef = createRef<Stack>();
   build(root: Group) {
     <Stack
       ref={this.containerRef}
@@ -53,96 +60,77 @@ class DCVH extends ViewHolder {
           height={30}
           gravity={Gravity.CenterY}
           space={1}
-        >
-          <Text
-            layoutConfig={layoutConfig().fitWidth().mostHeight()}
-            padding={{ left: 20, right: 20 }}
-            backgroundColor={Color.WHITE}
-          >
-            Log
-          </Text>
-          <Text
-            layoutConfig={layoutConfig().fitWidth().mostHeight()}
-            padding={{ left: 20, right: 20 }}
-            backgroundColor={Color.WHITE}
-          >
-            Element
-          </Text>
-          <Text
-            layoutConfig={layoutConfig().fitWidth().mostHeight()}
-            padding={{ left: 20, right: 20 }}
-            backgroundColor={Color.WHITE}
-          >
-            VMState
-          </Text>
-          <Text
-            layoutConfig={layoutConfig().fitWidth().mostHeight()}
-            padding={{ left: 20, right: 20 }}
-            backgroundColor={Color.WHITE}
-          >
-            Trace
-          </Text>
-        </HLayout>
-        <HLayout
+          ref={this.tabRef}
+        />
+        <Stack
           layoutConfig={layoutConfig().mostWidth().justHeight()}
           height={300}
+          ref={this.contentRef}
           backgroundColor={Color.WHITE}
-          gravity={Gravity.CenterY}
-        >
-          <Text ref={this.contentRef}></Text>
-        </HLayout>
+        />
       </VLayout>
     </Stack>;
   }
 }
 
 class DCVM extends ViewModel<DCModel, DCVH> {
+  vRecord: Map<
+    DCModule<any>,
+    {
+      title: View;
+      content: View;
+    }
+  > = new Map();
+
   onAttached(state: DCModel, vh: DCVH) {
     vh.containerRef.current.onClick = () => {
       this.updateState((state) => (state.show = false));
     };
+    state.dcModules.forEach((e) => {
+      const title = (
+        <Text
+          layoutConfig={layoutConfig().fitWidth().mostHeight()}
+          padding={{ left: 20, right: 20 }}
+          backgroundColor={Color.WHITE}
+          onClick={() => {
+            this.updateState((state) => (state.selectedModule = e));
+          }}
+        >
+          {e.title()}
+        </Text>
+      );
+      const content = <Stack layoutConfig={layoutConfig().most()} />;
+      vh.tabRef.current.addChild(title);
+      vh.contentRef.current.addChild(content);
+      this.vRecord.set(e, { title, content });
+      e.build(content as Group);
+      e.onAttached(e._state);
+    });
   }
   onBind(state: DCModel, vh: DCVH) {
     vh.containerRef.current.hidden = !state.show;
-    vh.contentRef.current.text = state.logRecords.length + "";
+    this.vRecord.forEach((v, k) => {
+      v.content.hidden = !(k === state.selectedModule);
+      v.title.backgroundColor =
+        k === state.selectedModule ? Color.WHITE : Color.parse("#95a5a6");
+    });
   }
 }
 
 export function openDConsole(context: BridgeContext) {
   const panel = context.entity as Panel;
   const originBuild = (panel as any)["__build__"];
-  const originDestroy = (panel as any)["__onDestroy__"];
-  const global = new Function("return this")();
-  const nativeLog = global["nativeLog"];
   const btnRef = createRef<GestureContainer>();
+  const dcModules = DCM.map((e) => new e(context));
   const vm = new DCVM(
     {
       show: false,
-      logRecords: [],
+      dcModules,
+      selectedModule: dcModules[0],
     },
     new DCVH()
   );
   vm.context = context;
-  global["nativeLog"] = function () {
-    const args = [];
-    for (let i = 0; i < arguments.length; i++) {
-      args.push(arguments[i]);
-    }
-    if (!!vm.getViewHolder().containerRef.current) {
-      vm.updateState((state) =>
-        state.logRecords.push({
-          type: arguments[0] as "d" | "w" | "e",
-          message: arguments[1] as string,
-        })
-      );
-    } else {
-      vm.getState().logRecords.push({
-        type: arguments[0] as "d" | "w" | "e",
-        message: arguments[1] as string,
-      });
-    }
-    return Reflect.apply(nativeLog, undefined, args);
-  };
   (panel as any)["__build__"] = (frame: any) => {
     Reflect.apply(originBuild, panel, [frame]);
 
@@ -214,10 +202,5 @@ export function openDConsole(context: BridgeContext) {
       </Text>
     </GestureContainer>;
     vm.attach(panel.getRootView());
-  };
-
-  (panel as any)["__onDestroy__"] = () => {
-    global["nativeLog"] = nativeLog;
-    Reflect.apply(originDestroy, panel, []);
   };
 }
