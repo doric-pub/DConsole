@@ -12,9 +12,11 @@ export abstract class DCModule<T> {
   abstract build(group: Group): void;
   abstract onAttached(state: T): void;
   abstract onBind(state: T): void;
-
+  onDestroy?: () => void;
   updateState(setter: Setter<T>) {
     setter(this._state);
     this.onBind(this._state);
   }
+  onShow() {}
+  onHide() {}
 }
