@@ -18,40 +18,31 @@ export class StateModule extends DCModule<StateModel> {
     build(group: Group): void {
         group.backgroundColor = Color.CYAN;
     }
+    onShow(): void {
+        log(`StateModule onShow`)
+    }
+    onHide(): void {
+        log(`StateModule onHide`)
+    }
+
     onAttached(state: StateModel): void {
 
-        // const panel = context.entity as Panel;
-
-        const panel = context.entity as VMPanel<Object, ViewHolder>;
-        log(`onAttached start: ${JSON.stringify(panel.allHeadViews)}`);
+        const panel = context.entity;
+        log(`panel type: ${typeof panel}`);
 
         if (panel instanceof VMPanel) {
-            const originShow = (panel as any)["__onShow__"];
+            // const panel = context.entity as VMPanel<Object, ViewHolder>;
+            log(`StateModule onAttached: ${JSON.stringify(panel.getState())}`);
 
-            (panel as any)["__onShow__"] = () => {
-                Reflect.apply(originShow, panel, []);
-
-                log(`__onShow__ onAttached: ${panel.getState}`);
-                const originVM = (panel as any)["vm"];
-                log(`__onShow__ originVM: ${originVM}`);
-
-            };
-
+            // const originShow = (panel as any)["__onShow__"];
+            // (panel as any)["__onShow__"] = () => {
+            //     Reflect.apply(originShow, panel, []);
+            //     log(`StateModule __onShow__`);
+            // };
         }
-
-        // const originVM = (panel as any)["vm"];
-        // log(`originVM: ${originVM}`);
-
-
-        // originVM["updateState"] = (setter: any) => {
-        //     // log(`updateState: ${panel.getState}`);
-        // };
-
-
-
         log(`onAttached end.....`);
-
     }
+
     onBind(state: StateModel): void {
         log(`onBind`);
     }
