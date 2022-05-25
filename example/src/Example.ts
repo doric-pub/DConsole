@@ -13,9 +13,11 @@ import {
   log,
   loge,
   logw,
+  navigator,
 } from "doric";
 import { demoPlugin } from "dconsole";
 import { openDConsole } from "./dConsole";
+import { CounterDemo } from "./CounterDemo";
 
 @Entry
 class Example extends Panel {
@@ -43,9 +45,23 @@ class Example extends Panel {
         layoutConfig: layoutConfig().fit(),
         padding: { left: 20, right: 20, top: 20, bottom: 20 },
       }),
+      text({
+        text: "State",
+        textSize: 20,
+        backgroundColor: Color.parse("#70a1ff"),
+        textColor: Color.WHITE,
+        onClick: async () => {
+          log("mvvm state");
+          logw("mvvm state");
+          loge("mvvm state");
+          navigator(this.context).push(CounterDemo)
+        },
+        layoutConfig: layoutConfig().fit(),
+        padding: { left: 20, right: 20, top: 20, bottom: 20 },
+      }),
     ])
       .apply({
-        layoutConfig: layoutConfig().fit().configAlignment(Gravity.Center),
+        layoutConfig: layoutConfig().fit().configAlignment(Gravity.CenterX),
         space: 20,
         gravity: Gravity.Center,
       })
