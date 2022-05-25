@@ -21,7 +21,9 @@ import {
   ViewModel,
   ClassType,
   View,
+  keyboard,
 } from "doric";
+import { loge } from "doric/lib/src/util/log";
 import { DCModule } from "./module/dcModule";
 import { ElementModule } from "./module/ElementModule";
 import { LogModule } from "./module/LogModule";
@@ -110,12 +112,27 @@ class DCVM extends ViewModel<DCModel, DCVH> {
     });
   }
   onBind(state: DCModel, vh: DCVH) {
-    vh.containerRef.current.hidden = !state.show;
     this.vRecord.forEach((v, k) => {
-      v.content.hidden = !(k === state.selectedModule);
+      if (v.content.hidden !== !(k === state.selectedModule)) {
+        v.content.hidden = !(k === state.selectedModule);
+        if (v.content.hidden) {
+          k.onHide();
+        } else {
+          k.onShow();
+        }
+      } else if (vh.containerRef.current.hidden !== !state.show) {
+        if (k === state.selectedModule) {
+          if (state.show) {
+            k.onShow();
+          } else {
+            k.onHide();
+          }
+        }
+      }
       v.title.backgroundColor =
         k === state.selectedModule ? Color.WHITE : Color.parse("#95a5a6");
     });
+    vh.containerRef.current.hidden = !state.show;
   }
 }
 
@@ -196,7 +213,6 @@ export function openDConsole(context: BridgeContext) {
     >
       <Text
         padding={{ left: 15, right: 15, top: 10, bottom: 10 }}
-        alpha={0.6}
         textColor={Color.WHITE}
         fontStyle={"bold"}
       >
@@ -204,5 +220,28 @@ export function openDConsole(context: BridgeContext) {
       </Text>
     </GestureContainer>;
     vm.attach(panel.getRootView());
+    const destroyCallbacks: Function[] = [];
+    const global = new Function("return this")();
+    const originJSReleaseContext = global.doric.jsReleaseContext;
+    global.doric.jsReleaseContext = (id: string) => {
+      if (id === context.id) {
+        vm.getState().dcModules.forEach((module) => module.onDestroy?.());
+        destroyCallbacks.forEach((e) => e());
+      }
+      Reflect.apply(originJSReleaseContext, global.doric, [id]);
+    };
+    keyboard(context)
+      .subscribe((data) => {
+        if (Environment.platform === "iOS") {
+          vm.getViewHolder().containerRef.current.translationY = -(
+            data.bottomMargin + data.height
+          );
+        }
+      })
+      .then((subId) => {
+        destroyCallbacks.push(() => {
+          keyboard(context).unsubscribe(subId);
+        });
+      });
   };
 }

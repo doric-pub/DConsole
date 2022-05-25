@@ -37,10 +37,10 @@ class Example extends Panel {
         textSize: 20,
         backgroundColor: Color.parse("#70a1ff"),
         textColor: Color.WHITE,
-        onClick: async () => {
-          log("Hello,Console");
-          logw("Hello,Console");
-          loge("Hello,Console");
+        onClick: () => {
+          log("Hello, Console");
+          logw("Hello, Console");
+          loge("Hello, Console");
         },
         layoutConfig: layoutConfig().fit(),
         padding: { left: 20, right: 20, top: 20, bottom: 20 },
