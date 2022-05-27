@@ -12,7 +12,6 @@ import {
   layoutConfig,
   List,
   ListItem,
-  log,
   modal,
   Stack,
   Text,
@@ -31,9 +30,9 @@ import Immutable from "immutable";
 type StateModel = Map<string, any>[];
 
 export class StateModule extends DCModule<StateModel> {
-  history: Map<string, any>[] = [];
+  history: Map<string, any>[] = []; // state状态记录容器
   listRef = createRef<List>();
-  recordMax = 100;
+  recordMax = 100; // state状态记录的最大条数
 
   title(): string {
     return "State";
@@ -44,29 +43,28 @@ export class StateModule extends DCModule<StateModel> {
   }
 
   onShow(): void {
-    log(`onShow:>>>>>>>>>>>>>>>> `);
     this.resetList();
   }
 
   build(group: Group): void {
-    group.backgroundColor = Color.CYAN;
-    <VLayout
-      parent={group}
-      layoutConfig={layoutConfig().most()}
-      backgroundColor={Color.WHITE}
-    >
+    group.backgroundColor = Color.parse("#ecf0f1");
+    <VLayout parent={group} layoutConfig={layoutConfig().most()}>
       <List
         layoutConfig={layoutConfig().mostWidth().justHeight().configWeight(1)}
+        backgroundColor={Color.WHITE}
         ref={this.listRef}
       />
       <FlexLayout
-        layoutConfig={layoutConfig().mostWidth().justHeight()}
+        layoutConfig={layoutConfig()
+          .mostWidth()
+          .justHeight()
+          .configMargin({ top: 5, bottom: 5 })}
         height={30}
         backgroundColor={Color.parse("#ecf0f1")}
         flexConfig={{
           flexDirection: FlexDirection.ROW,
           justifyContent: Justify.SPACE_EVENLY,
-          alignContent: Align.CENTER,
+          alignContent: Align.FLEX_END,
         }}
       >
         {this.bottomButtons()}
@@ -75,7 +73,7 @@ export class StateModule extends DCModule<StateModel> {
   }
 
   bottomButtons() {
-    const btnTitles = ["Undo", "Redo"];
+    const btnTitles = ["Undo", "Clear"];
     const btns: any[] = [];
     const self = this;
     btnTitles.forEach((title, index) => {
@@ -84,7 +82,8 @@ export class StateModule extends DCModule<StateModel> {
         <GestureContainer
           backgroundColor={Color.parse("#2ecc71")}
           ref={btnRef}
-          layoutConfig={layoutConfig().fitWidth().mostHeight()}
+          height={30}
+          layoutConfig={layoutConfig().fitWidth().justHeight()}
           corners={15}
           onClick={() => {
             if (title === "Undo") {
@@ -93,24 +92,27 @@ export class StateModule extends DCModule<StateModel> {
                 return;
               }
               self.history.pop();
-              self._state.pop();
               self.resetList();
-            } else if (title === "Redo") {
-            }
-            const panel = this.context.entity;
-            if (panel instanceof VMPanel) {
-              log(`click btn ${title}`);
-              const vm = panel.getViewModel();
-              if (vm && Reflect.has(vm, "viewHolder")) {
-                const vh = Reflect.get(vm, "viewHolder");
-                const onBindFunc = (vm as any)["onBind"];
-                const state = self.history[self.history.length - 1]
-                  .get("value")
-                  .toJS();
-                Reflect.set(vm, "state", state);
-                log(`Undo state is ${state} , ${JSON.stringify(state)}`);
-                Reflect.apply(onBindFunc, vm, [state, vh]);
+              const panel = this.context.entity;
+              if (panel instanceof VMPanel) {
+                const vm = panel.getViewModel();
+                if (vm && Reflect.has(vm, "viewHolder")) {
+                  const vh = Reflect.get(vm, "viewHolder");
+                  const onBindFunc = (vm as any)["onBind"];
+                  const state = self.history[self.history.length - 1]
+                    .get("value")
+                    .toJS();
+                  Reflect.set(vm, "state", state);
+                  Reflect.apply(onBindFunc, vm, [state, vh]);
+                }
               }
+            } else if (title === "Clear") {
+              if (self.history.length == 0) {
+                modal(this.context).toast(`无需清除！`);
+                return;
+              }
+              self.history.length = 0;
+              self.resetList();
             }
           }}
           onTouchDown={() => {
@@ -150,10 +152,7 @@ export class StateModule extends DCModule<StateModel> {
         });
         const originUpdateState = (vm as any)["updateState"];
         (vm as any)["updateState"] = (setter: any) => {
-          log(`监听到数据更新 start:`);
           Reflect.apply(originUpdateState, vm, [setter]);
-          log(`原始方法updateState执行 end`);
-          //   self.saveStateToHistory(vm.getState(), this._state, "updateState");
           self.updateState((s) => {
             self.saveStateToHistory(vm.getState(), s, "updateState");
           });
@@ -198,21 +197,17 @@ export class StateModule extends DCModule<StateModel> {
   }
 
   saveStateToHistory(stateObj: Object, s: StateModel, action: string) {
-    const string = JSON.stringify(stateObj);
-    log(`saveStateToHistory: ${string}`);
+    // const string = JSON.stringify(stateObj);
     // const obj = JSON.parse(string);
     const immutableMap = Immutable.fromJS(stateObj);
     const data = Immutable.Map({ action: action, value: immutableMap });
     this.history.push(data);
-    s.push(data);
     if (this.history.length > this.recordMax) {
       this.history.splice(0, this.recordMax / 2);
-      s.splice(0, this.recordMax / 2);
     }
   }
 
   onBind(state: StateModel): void {
-    log(`history: ${JSON.stringify(this.history)}`);
     this.listRef.current.itemCount = this.history.length;
     if (this.history.length > 0) {
       this.listRef.current.scrolledPosition = this.history.length - 1;
