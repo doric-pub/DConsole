@@ -40,8 +40,8 @@ class CounterVM extends ViewModel<CountModel, CounterView> {
         vh.clickText.onClick = () => {
             Promise.resolve(this.getState().count).then(count => {
                 Promise.resolve().then(() => {
-                    this.updateState((state: CountModel) => {
-                        state.count = count + 1
+                    this.updateState((s: CountModel) => {
+                        s.count = count + 1
                     })
                 })
             })
