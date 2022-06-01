@@ -2,13 +2,19 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-function demoPlugin(context) {
+function dconsolePlugin(context) {
     return {
-        call: () => {
-            return context.callNative("demoPlugin", "call");
+        libraries: () => {
+            return context.callNative("dconsolePlugin", "libraries");
+        },
+        nativePlugins: () => {
+            return context.callNative("dconsolePlugin", "nativePlugins");
+        },
+        viewNodes: () => {
+            return context.callNative("dconsolePlugin", "viewNodes");
         },
     };
 }
 
-exports.demoPlugin = demoPlugin;
+exports.dconsolePlugin = dconsolePlugin;
 //# sourceMappingURL=bundle_dconsole.js.map

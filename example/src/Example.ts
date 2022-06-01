@@ -15,7 +15,6 @@ import {
   logw,
   navigator,
 } from "doric";
-import { demoPlugin } from "dconsole";
 import { openDConsole } from "./dConsole";
 import { CounterDemo } from "./CounterDemo";
 
@@ -38,7 +37,7 @@ class Example extends Panel {
         backgroundColor: Color.parse("#70a1ff"),
         textColor: Color.WHITE,
         onClick: () => {
-          log("Hello, Console");
+          log("Hello, Console1");
           logw("Hello, Console");
           loge("Hello, Console");
         },
