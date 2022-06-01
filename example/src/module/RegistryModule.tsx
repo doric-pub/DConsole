@@ -21,11 +21,7 @@ import {
 import { DCModule } from "./dcModule";
 import { dconsolePlugin } from "dconsole";
 
-type StateModel = {
-  currentSelectIndex: number;
-};
-
-export class RegistryModule extends DCModule<StateModel> {
+export class RegistryModule extends DCModule<number> {
   listRef = createRef<List>();
   sliderRef = createRef<Slider>();
   currentSelectIndex: number = 0;
@@ -35,15 +31,14 @@ export class RegistryModule extends DCModule<StateModel> {
   btnTitles = ["libraries", "plugins", "nodes"];
   datas: string[][] = [];
   btns: GestureContainer[] = [];
+  btnTexts: Text[] = [];
 
   title(): string {
     return "Registry";
   }
 
-  state(): StateModel {
-    return {
-      currentSelectIndex: 0,
-    };
+  state(): number {
+    return 0;
   }
 
   build(group: Group): void {
@@ -83,6 +78,7 @@ export class RegistryModule extends DCModule<StateModel> {
 
   bottomButtons() {
     const btns: GestureContainer[] = [];
+    const btnTexts: Text[] = [];
     const self = this;
     this.btnTitles.forEach((title, index) => {
       function innerUpdateUI() {
@@ -91,6 +87,18 @@ export class RegistryModule extends DCModule<StateModel> {
         self.updateBottomBtnState();
       }
       const btnRef = createRef<GestureContainer>();
+      const text = (
+        <Text
+          padding={{ left: 15, right: 15 }}
+          textColor={Color.WHITE}
+          fontStyle={"bold"}
+          layoutConfig={layoutConfig().fit().configAlignment(Gravity.Center)}
+        >
+          {title}
+        </Text>
+      ) as Text;
+      btnTexts.push(text);
+
       const btn = (
         <GestureContainer
           backgroundColor={Color.LTGRAY}
@@ -100,7 +108,7 @@ export class RegistryModule extends DCModule<StateModel> {
           corners={15}
           onClick={() => {
             self.scrollToIndex(index);
-            self._state.currentSelectIndex = index;
+            self.currentSelectIndex = index;
           }}
           onTouchDown={() => {
             btnRef.current.backgroundColor = Color.parse("#16a085");
@@ -112,24 +120,17 @@ export class RegistryModule extends DCModule<StateModel> {
             innerUpdateUI();
           }}
         >
-          <Text
-            padding={{ left: 15, right: 15 }}
-            textColor={Color.WHITE}
-            fontStyle={"bold"}
-            textSize={18}
-            layoutConfig={layoutConfig().fit().configAlignment(Gravity.Center)}
-          >
-            {title}
-          </Text>
+          {text}
         </GestureContainer>
       ) as GestureContainer;
       btns.push(btn);
     });
     this.btns = btns;
+    this.btnTexts = btnTexts;
     return btns;
   }
 
-  onAttached(state: StateModel): void {
+  onAttached(state: number): void {
     this.readData();
     const self = this;
     this.sliderRef.apply({
@@ -174,7 +175,7 @@ export class RegistryModule extends DCModule<StateModel> {
         ) as SlideItem;
       },
       onPageSlided: (index) => {
-        self._state.currentSelectIndex = index;
+        self.currentSelectIndex = index;
         self.updateBottomBtnState();
       },
     });
@@ -184,20 +185,34 @@ export class RegistryModule extends DCModule<StateModel> {
     this.btns.forEach((btn, index) => {
       btn.apply({
         backgroundColor:
-          this._state.currentSelectIndex === index
+          this.currentSelectIndex === index
             ? Color.parse("#2ecc71")
             : Color.LTGRAY,
+      });
+    });
+    this.btnTexts.forEach((t, index) => {
+      var str = '';
+      const count = ` : ${this.datas[index].length}`;
+      if (index === 0) {
+        str = "libraries" + count;
+      } else if (index === 1) {
+        str = "plugins" + count;
+      } else if (index === 2) {
+        str = "nodes" + count;
+      }
+      t.apply({
+        text: str,
       });
     });
   }
 
   scrollToIndex(index: number) {
-    if (index != this._state.currentSelectIndex) {
+    if (index != this.currentSelectIndex) {
       this.sliderRef.current.slidePage(this.context, index, true);
     }
   }
 
-  onBind(state: StateModel): void {
+  onBind(state: number): void {
     this.sliderRef.apply({
       itemCount: this.datas.length,
     });
