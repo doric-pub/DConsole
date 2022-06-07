@@ -7,7 +7,6 @@
 
 #import "DConsolePlugin.h"
 #import <DoricCore/DoricSingleton.h>
-#import <objc/runtime.h>
 
 @implementation DConsolePlugin
 
@@ -20,52 +19,34 @@
 }
 
 - (void)nativePlugins:(NSDictionary *)dic withPromise:(DoricPromise *)promise {
-    NSMutableDictionary *pluginsDict = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableArray *plugins = @[].mutableCopy;
     for (DoricRegistry *registry in DoricSingleton.instance.registries) {
         if (registry) {
-            unsigned int count;
-            objc_property_t *propertyList = class_copyPropertyList(registry.class, &count);
-              for (unsigned int i = 0; i < count; i++) {
-                  const char *property = property_getName(propertyList[i]);
-                  NSString *propertyName = [NSString stringWithUTF8String:property];
-                  if ([propertyName isEqualToString:@"plugins"]) {
-                      NSMutableDictionary *plugins = [registry valueForKey:@"plugins"];
-                      [pluginsDict addEntriesFromDictionary:[plugins copy]];
-                      break;
-                  }
-              }
-              free(propertyList);
+            NSArray *pluginKeys = [registry allPlugins];
+            [pluginKeys enumerateObjectsUsingBlock:^(id  _Nonnull key, NSUInteger idx, BOOL * _Nonnull stop) {
+                Class class = [registry acquireNativePlugin:key];
+                if (class) {
+                    [plugins addObject:[NSString stringWithFormat:@"%@ = %@", key, NSStringFromClass(class)]];
+                }
+            }];
         }
     }
-    NSMutableArray *plugins = @[].mutableCopy;
-    [pluginsDict enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, Class obj, BOOL * _Nonnull stop) {
-        [plugins addObject:[NSString stringWithFormat:@"%@ = %@", key, NSStringFromClass(obj)]];
-    }];
     [promise resolve:[plugins copy]];
 }
 
 - (void)viewNodes:(NSDictionary *)dic withPromise:(DoricPromise *)promise {
-    NSMutableDictionary *nodesDict = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableArray *nodes = @[].mutableCopy;
     for (DoricRegistry *registry in DoricSingleton.instance.registries) {
         if (registry) {
-            unsigned int count;
-            objc_property_t *propertyList = class_copyPropertyList(registry.class, &count);
-              for (unsigned int i = 0; i < count; i++) {
-                  const char *property = property_getName(propertyList[i]);
-                  NSString *propertyName = [NSString stringWithUTF8String:property];
-                  if ([propertyName isEqualToString:@"nodes"]) {
-                      NSMutableDictionary *nodes = [registry valueForKey:@"nodes"];
-                      [nodesDict addEntriesFromDictionary:[nodes copy]];
-                      break;
-                  }
-              }
-              free(propertyList);
+            NSArray *nodeKeys = [registry allViewNodes];
+            [nodeKeys enumerateObjectsUsingBlock:^(id  _Nonnull key, NSUInteger idx, BOOL * _Nonnull stop) {
+                Class class = [registry acquireViewNode:key];
+                if (class) {
+                    [nodes addObject:[NSString stringWithFormat:@"%@ = %@", key, NSStringFromClass(class)]];
+                }
+            }];
         }
     }
-    NSMutableArray *nodes = @[].mutableCopy;
-    [nodesDict enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, Class obj, BOOL * _Nonnull stop) {
-        [nodes addObject:[NSString stringWithFormat:@"%@ = %@", key, NSStringFromClass(obj)]];
-    }];
     [promise resolve:[nodes copy]];
 }
 

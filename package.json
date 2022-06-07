@@ -1,27 +1,27 @@
 {
-  "name": "dconsole",
-  "version": "0.1.0",
-  "main": "dist/bundle_dconsole.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "doric build",
-    "dev": "cd example && doric dev",
-    "clean": "cd example && doric clean",
-    "android": "cd example && doric run android",
-    "ios": "cd example && doric run iOS"
-  },
-  "license": "Apache-2.0",
-  "dependencies": {
-    "doric": ">=0.10.10",
-    "doric-cli": ">=0.10.10"
-  },
-  "devDependencies": {
-    "typescript": "^4.2.2",
-    "rollup": "^2.24.0",
-    "@rollup/plugin-buble": "^0.21.3",
-    "@rollup/plugin-commonjs": "^14.0.0",
-    "@rollup/plugin-image": "^2.0.5",
-    "@rollup/plugin-json": "^4.1.0",
-    "@rollup/plugin-node-resolve": "^8.4.0"
-  }
+    "name": "dconsole",
+    "version": "0.1.0",
+    "main": "dist/bundle_dconsole.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "doric build",
+        "dev": "cd example && doric dev",
+        "clean": "cd example && doric clean",
+        "android": "cd example && doric run android",
+        "ios": "cd example && doric run iOS"
+    },
+    "license": "Apache-2.0",
+    "dependencies": {
+        "doric": ">=0.10.12",
+        "doric-cli": ">=0.10.12"
+    },
+    "devDependencies": {
+        "typescript": "^4.2.2",
+        "rollup": "^2.24.0",
+        "@rollup/plugin-buble": "^0.21.3",
+        "@rollup/plugin-commonjs": "^14.0.0",
+        "@rollup/plugin-image": "^2.0.5",
+        "@rollup/plugin-json": "^4.1.0",
+        "@rollup/plugin-node-resolve": "^8.4.0"
+    }
 }
