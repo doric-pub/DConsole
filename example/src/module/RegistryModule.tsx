@@ -74,6 +74,9 @@ export class RegistryModule extends DCModule<number> {
     this.datas.length = 0;
     this.datas = this.datas.concat([this.libraries, this.plugins, this.nodes]);
     this.onBind(this._state);
+    setTimeout(() => {
+      this.sliderRef.current.slidePage(this.context, this.currentSelectIndex, true);
+    }, 500);
   }
 
   bottomButtons() {
@@ -191,7 +194,7 @@ export class RegistryModule extends DCModule<number> {
       });
     });
     this.btnTexts.forEach((t, index) => {
-      var str = '';
+      var str = "";
       const count = ` : ${this.datas[index].length}`;
       if (index === 0) {
         str = "libraries" + count;

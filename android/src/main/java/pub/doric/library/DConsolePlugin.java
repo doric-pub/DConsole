@@ -29,13 +29,9 @@ public class DConsolePlugin extends DoricJavaPlugin {
     @DoricMethod
     public void libraries(DoricPromise promise) {
         List<String> librariesList = new ArrayList<>();
-
         for (DoricLibrary library : DoricSingleton.getInstance().libraries) {
             if (library != null) {
-                Log.d("wushangkun", "getSimpleName library: " + library.getClass().getSimpleName());
-                Log.d("wushangkun", "getName library: " + library.getClass().getName());
-                Log.d("wushangkun", "getCanonicalName library: " + library.getClass().getCanonicalName());
-                librariesList.add(library.getClass().getCanonicalName());
+                librariesList.add(library.getClass().getSimpleName());
             }
         }
         JSONArray jsonArray = new JSONArray(librariesList);
@@ -53,8 +49,8 @@ public class DConsolePlugin extends DoricJavaPlugin {
                     for (String key : pluginsSet) {
                         DoricMetaInfo<DoricJavaPlugin> pluginInfo = registry.acquirePluginInfo(key);
                         if (pluginInfo != null) {
-                            String formatStr = String.format("%s = %s", key, pluginInfo.getName());
-                            Log.d("wushangkun", "plugin "+formatStr);
+                            DoricJavaPlugin plugin = pluginInfo.createInstance(getDoricContext());
+                            String formatStr = String.format("%s = %s", key, plugin.getClass().getSimpleName());
                             pluginsList.add(formatStr);
                         }
                     }
@@ -76,8 +72,8 @@ public class DConsolePlugin extends DoricJavaPlugin {
                     for (String key : nodesSet) {
                         DoricMetaInfo<ViewNode<?>> nodeInfo = registry.acquireViewNodeInfo(key);
                         if (nodeInfo != null) {
-                            String formatStr = String.format("%s = %s", key, nodeInfo.getName());
-                            Log.d("wushangkun", "node "+formatStr);
+                            ViewNode<?> node = nodeInfo.createInstance(getDoricContext());
+                            String formatStr = String.format("%s = %s", key, node.getClass().getSimpleName());
                             nodesList.add(formatStr);
                         }
                     }

@@ -37,7 +37,7 @@ class Example extends Panel {
         backgroundColor: Color.parse("#70a1ff"),
         textColor: Color.WHITE,
         onClick: () => {
-          log("Hello, Console1");
+          log("Hello, Console");
           logw("Hello, Console");
           loge("Hello, Console");
         },
