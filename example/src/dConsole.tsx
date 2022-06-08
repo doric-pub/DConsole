@@ -27,9 +27,10 @@ import { loge } from "doric/lib/src/util/log";
 import { DCModule } from "./module/dcModule";
 import { ElementModule } from "./module/ElementModule";
 import { LogModule } from "./module/LogModule";
+import { RegistryModule } from "./module/RegistryModule";
 import { StateModule } from "./module/StateModule";
 
-const DCM: ClassType<DCModule<any>>[] = [LogModule, ElementModule, StateModule];
+const DCM: ClassType<DCModule<any>>[] = [LogModule, ElementModule, StateModule, RegistryModule];
 
 type DCModel = {
   show: boolean;

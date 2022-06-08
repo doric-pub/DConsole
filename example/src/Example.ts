@@ -15,7 +15,6 @@ import {
   logw,
   navigator,
 } from "doric";
-import { demoPlugin } from "dconsole";
 import { openDConsole } from "./dConsole";
 import { CounterDemo } from "./CounterDemo";
 
