@@ -23,12 +23,12 @@ import {
   View,
   keyboard,
 } from "doric";
-import { loge } from "doric/lib/src/util/log";
 import { DCModule } from "./module/dcModule";
 import { ElementModule } from "./module/ElementModule";
 import { LogModule } from "./module/LogModule";
 import { RegistryModule } from "./module/RegistryModule";
 import { StateModule } from "./module/StateModule";
+import { identifier } from "./utils";
 
 const DCM: ClassType<DCModule<any>>[] = [LogModule, ElementModule, StateModule, RegistryModule];
 
@@ -45,6 +45,7 @@ class DCVH extends ViewHolder {
   build(root: Group) {
     <Stack
       ref={this.containerRef}
+      tag={identifier}
       hidden={true}
       alpha={0.5}
       parent={root}
@@ -156,6 +157,7 @@ export function openDConsole(context: BridgeContext) {
 
     <GestureContainer
       ref={btnRef}
+      tag={identifier}
       parent={panel.getRootView()}
       backgroundColor={Color.parse("#2ecc71")}
       layoutConfig={layoutConfig()

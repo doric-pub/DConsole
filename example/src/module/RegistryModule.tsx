@@ -12,6 +12,7 @@ import {
   layoutConfig,
   List,
   ListItem,
+  log,
   SlideItem,
   Slider,
   Stack,
@@ -20,6 +21,16 @@ import {
 } from "doric";
 import { DCModule } from "./dcModule";
 import { dconsolePlugin } from "dconsole";
+
+type TestModel = {
+  info: {
+    age: number,
+  },
+  uid: number,
+  size: number,
+  name: string,
+};
+
 
 export class RegistryModule extends DCModule<number> {
   listRef = createRef<List>();
@@ -68,6 +79,14 @@ export class RegistryModule extends DCModule<number> {
   }
 
   async readData() {
+    let str = await dconsolePlugin(this.context).testNumber();
+    log(`typescript str = ${str}`);
+    let jsonObj: TestModel = JSON.parse(str);
+    log(`typescript jsonObj = ${jsonObj}`);
+    let jsonStr = JSON.stringify(jsonObj);
+    log(`typescript jsonStr = ${jsonStr}`);
+    log(`typescript >>> ${jsonObj.uid}, ${jsonObj.name}, ${jsonObj.size}, ${jsonObj.info.age}`);
+
     this.libraries = await dconsolePlugin(this.context).libraries();
     this.plugins = await dconsolePlugin(this.context).nativePlugins();
     this.nodes = await dconsolePlugin(this.context).viewNodes();
