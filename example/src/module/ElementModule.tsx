@@ -23,7 +23,7 @@ import {
   Text,
   View,
 } from "doric";
-import { identifier } from "../utils";
+import { identifier, purpRedColor } from "../utils";
 import { DCModule } from "./dcModule";
 
 type ElementModel = {
@@ -106,9 +106,9 @@ export class ElementModule extends DCModule<ElementModel> {
               <Text
                 layoutConfig={layoutConfig().mostWidth().fitHeight()}
                 maxLines={-1}
-                textColor={Color.BLACK}
+                textColor={purpRedColor}
                 fontStyle={"bold"}
-                padding={{ left: 0, top: 8, right: 5, bottom: 8 }}
+                padding={{ left: 0, top: 5, right: 5, bottom: 5 }}
                 textAlignment={Gravity.CenterY.left()}
                 textSize={13}
               >
