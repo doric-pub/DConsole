@@ -1,9 +1,7 @@
 import {
-  Align,
   AssetsResource,
   Color,
   createRef,
-  gravity,
   Gravity,
   Group,
   HLayout,
@@ -29,19 +27,24 @@ import { DCModule } from "./dcModule";
 type ElementModel = {
   data?: NativeViewModel;
   level: number;
+  unfold: boolean;
+  displayChildren: string[];
 };
 
-export class ElementModule extends DCModule<ElementModel> {
+type Elements = ElementModel[];
+
+export class ElementModule extends DCModule<Elements> {
   // 所有的元素
-  allElement: ElementModel[] = [];
+  allElements: ElementModel[] = [];
   listRef = createRef<List>();
+  deleteEleMap: Map<string, Elements> = new Map();
 
   title() {
     return "Element";
   }
 
   state() {
-    return { level: 0 };
+    return [];
   }
 
   build(group: Group) {
@@ -53,80 +56,72 @@ export class ElementModule extends DCModule<ElementModel> {
     ></List>;
   }
 
-  onAttached(state: ElementModel) {
-    log(`Element onAttached`);
-    this.allElement.length = 0;
+  onAttached(state: Elements) {
+    this.allElements.length = 0;
     const panel = this.context.entity;
     const self = this;
     if (panel instanceof Panel) {
       const root = panel.getRootView();
-      this.logView(root, 0);
-      // loge(`root信息: ${root.nativeViewModel.type} (${root.nativeViewModel.id}) = ${JSON.stringify(root.nativeViewModel.props)}`);
-      // root.allSubviews().forEach((view, index) => {
-      //   loge(`开始1: ${view.nativeViewModel.type} (${view.nativeViewModel.id})`);
-      //   this.logView(view, 0);
-      //   loge(`结束2: ${view.nativeViewModel.type} (${view.nativeViewModel.id})`);
-      // });
+      this.recordView(root, 0);
     }
-    logw(
-      `最终所有元素: ${this.allElement.length}:\n ${JSON.stringify(
-        this.allElement
-      )}`
-    );
 
-    this.listRef.current.apply({
-      itemCount: this.allElement.length,
-      renderItem: (i) => {
-        const element = this.allElement[i];
-        const leftPadding = element.level *10;
-        return (
-          <ListItem
-            layoutConfig={layoutConfig().mostWidth().fitHeight()}
-            identifier={"element_cell"}
-          >
-            <HLayout
-              layoutConfig={layoutConfig().mostWidth().fitHeight()}
-              gravity={Gravity.CenterY.left()}
-            >
-              <Stack   
-              layoutConfig={layoutConfig().just()}
-                width={28}
-                height={28}
-                left={leftPadding}
-                >
-                <Image
-                layoutConfig={layoutConfig().just().configAlignment(Gravity.Center)}
-                width={14}
-                height={14}
-                scaleType={ScaleType.ScaleAspectFit}
-                image={new AssetsResource("console_arrow")}
-                border={{width: 1, color: Color.RED}}
-              ></Image>
-              </Stack>
-              <Text
-                layoutConfig={layoutConfig().mostWidth().fitHeight()}
-                maxLines={-1}
-                textColor={purpRedColor}
-                fontStyle={"bold"}
-                padding={{ left: 0, top: 5, right: 5, bottom: 5 }}
-                textAlignment={Gravity.CenterY.left()}
-                textSize={13}
-              >
-                {element.data?.type}
-              </Text>
-            </HLayout>
-            <Stack
-              layoutConfig={layoutConfig().mostWidth().justHeight()}
-              height={0.5}
-              backgroundColor={Color.parse("#bdc3c7")}
-            />
-          </ListItem>
-        ) as ListItem;
-      },
+    this._state.length = 0;
+    this._state = this._state.concat(this.allElements);
+    this.updateState((s) => {
+      logw(`最终所有元素: ${s.length}:\n ${JSON.stringify(s)}`);
     });
   }
 
-  logView(view: View, level: number) {
+  findElementById(id: string, source: ElementModel[]) {
+    return source.find((value) => {
+      return value.data?.id === id;
+    });
+  }
+
+  ///  点击箭头 展开 or 收齐
+  clickArrowImageAt(element: ElementModel) {
+    // loge(`click element 刷新界面 = ${JSON.stringify(element)}`);
+    if (element.unfold) {
+      // 收齐
+      let fromIndex = this._state.indexOf(element);
+      let level = element.level;
+      // logw(`收齐 fromIndex: ${fromIndex}, level: ${level}`);
+      element.unfold = false;
+      var toIndex = fromIndex;
+      for (let index = fromIndex + 1; index < this._state.length; index++) {
+        const ele = this._state[index];
+        toIndex = index;
+        if (ele.level > level) {
+          // logw(`>> ele[${index}] : ${ele.data?.type}, toIndex=${toIndex}`);
+        } else {
+          // logw(`break ele[${index}] : ${ele.data?.type}, toIndex=${toIndex}`);
+          toIndex--;
+          break;
+        }
+      }
+      let count = toIndex - fromIndex;
+      logw(`收齐 toIndex: ${toIndex}, count = ${count}`);
+      const deleteElements = this._state.splice(fromIndex + 1, count);
+      if (element.data?.id) {
+        this.deleteEleMap.set(element.data?.id, deleteElements);
+      }
+      this.updateState((s) => {});
+    } else {
+      // 展开
+      element.unfold = true;
+      let fromIndex = this._state.indexOf(element);
+      if (element.data?.id) {
+        let insertElements = this.deleteEleMap.get(element.data?.id);
+        if (insertElements) {
+          logw(`插入: ${JSON.stringify(insertElements)}`);
+          this._state.splice(fromIndex + 1, 0, ...insertElements);
+          this.updateState((s) => {});
+        }
+      }
+    }
+  }
+
+  recordView(view: View, level: number) {
     const nativeViewModel = view.nativeViewModel;
     if (view.tag === identifier) {
       loge(
@@ -134,22 +129,108 @@ export class ElementModule extends DCModule<ElementModel> {
       );
       return;
     }
-    this.allElement.push({ data: nativeViewModel, level: level });
-    // log(`111view[0]: ${nativeViewModel.type} (${nativeViewModel.id}) = ${JSON.stringify(nativeViewModel.props)}`);
-    log(`111view[${nativeViewModel.id}]: ${nativeViewModel.type}`);
+    const ele: ElementModel = {
+      data: nativeViewModel,
+      level: level,
+      unfold: true,
+      displayChildren: [],
+    };
+    this.allElements.push(ele);
     let children = nativeViewModel.props["children"];
     if (children && children instanceof Array && children.length > 0) {
       (children as string[]).forEach((viewId) => {
-        log(`222view[${viewId}]`);
         let subView = (view as Superview).subviewById(viewId);
-        if (subView != undefined) {
-          this.logView(subView, level + 1);
+        if (subView != undefined && view.tag != identifier) {
+          ele.displayChildren.push(subView.nativeViewModel.id);
+          this.recordView(subView, level + 1);
         }
       });
     }
   }
 
-  onBind(state: ElementModel) {
-    this.listRef.current.itemCount = this.allElement.length;
+  cellWith(element: ElementModel, index: number) {
+    const leftPadding = element.level * 10;
+    const isHiddenArrow = element.displayChildren.length === 0;
+    const arrowImage = (
+      <Image
+        layoutConfig={layoutConfig().just().configAlignment(Gravity.Center)}
+        width={10}
+        height={10}
+        scaleType={ScaleType.ScaleAspectFit}
+        image={new AssetsResource("console_arrow")}
+        rotation={element.unfold ? 0.5 : 0}
+        hidden={isHiddenArrow}
+      ></Image>
+    );
+    return (
+      <ListItem
+        layoutConfig={layoutConfig().mostWidth().fitHeight()}
+        identifier={"element_cell"}
+      >
+        <HLayout
+          layoutConfig={layoutConfig().mostWidth().fitHeight()}
+          gravity={Gravity.CenterY.left()}
+        >
+          <Stack
+            layoutConfig={layoutConfig().just()}
+            width={26}
+            height={26}
+            left={leftPadding}
+            onClick={() => {
+              if (arrowImage.hidden === false) {
+                this.clickArrowImageAt(element);
+              }
+              // const duration = 300;
+              // setTimeout(() => {
+              //   loge(`click element 刷新界面= ${JSON.stringify(element)}`);
+              // }, duration);
+              // animate(this.context)({
+              //   animations: () => {
+              //     if (element.unfold) {
+              //       arrowImage.rotation = 0;
+              //     } else {
+              //       arrowImage.rotation = 0.5;
+              //     }
+              //     element.unfold = !element.unfold;
+              //   },
+              //   duration: duration,
+              // });
+            }}
+          >
+            {arrowImage}
+          </Stack>
+          <Text
+            layoutConfig={layoutConfig().mostWidth().fitHeight()}
+            maxLines={-1}
+            textColor={purpRedColor}
+            fontStyle={"bold"}
+            padding={{ left: 0, top: 5, right: 5, bottom: 5 }}
+            textAlignment={Gravity.CenterY.left()}
+            textSize={12}
+          >
+            {element.data?.type}
+          </Text>
+        </HLayout>
+        <Stack
+          layoutConfig={layoutConfig().mostWidth().justHeight()}
+          height={0.5}
+          backgroundColor={Color.parse("#bdc3c7")}
+        />
+      </ListItem>
+    ) as ListItem;
+  }
+
+  onBind(state: Elements) {
+    // logw(
+    //   `onBind所有元素: ${this._state.length}:\n ${JSON.stringify(this._state)}`
+    // );
+    this.listRef.current.reset();
+    this.listRef.current.apply({
+      itemCount: this._state.length,
+      renderItem: (i) => {
+        const element = this._state[i];
+        return this.cellWith(element, i);
+      },
+    });
   }
 }
