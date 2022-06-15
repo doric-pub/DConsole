@@ -1,4 +1,5 @@
 import {
+  animate,
   AssetsResource,
   Color,
   createRef,
@@ -38,6 +39,7 @@ export class ElementModule extends DCModule<Elements> {
   allElements: ElementModel[] = [];
   listRef = createRef<List>();
   deleteEleMap: Map<string, Elements> = new Map();
+  isAnimating: boolean = false;
 
   title() {
     return "Element";
@@ -100,7 +102,7 @@ export class ElementModule extends DCModule<Elements> {
         }
       }
       let count = toIndex - fromIndex;
-      logw(`收齐 toIndex: ${toIndex}, count = ${count}`);
+      // logw(`收齐 toIndex: ${toIndex}, count = ${count}`);
       const deleteElements = this._state.splice(fromIndex + 1, count);
       if (element.data?.id) {
         this.deleteEleMap.set(element.data?.id, deleteElements);
@@ -113,7 +115,7 @@ export class ElementModule extends DCModule<Elements> {
       if (element.data?.id) {
         let insertElements = this.deleteEleMap.get(element.data?.id);
         if (insertElements) {
-          logw(`插入: ${JSON.stringify(insertElements)}`);
+          // logw(`插入: ${JSON.stringify(insertElements)}`);
           this._state.splice(fromIndex + 1, 0, ...insertElements);
           this.updateState((s) => {});
         }
@@ -177,24 +179,24 @@ export class ElementModule extends DCModule<Elements> {
             height={26}
             left={leftPadding}
             onClick={() => {
-              if (arrowImage.hidden === false) {
-                this.clickArrowImageAt(element);
+              if ((!this.isAnimating) && arrowImage.hidden === false) {
+                this.isAnimating = true;
+                const duration = 120;
+                setTimeout(() => {
+                  this.clickArrowImageAt(element);
+                  this.isAnimating = false;
+                }, duration);
+                animate(this.context)({
+                  animations: () => {
+                    if (element.unfold) {
+                      arrowImage.rotation = 0;
+                    } else {
+                      arrowImage.rotation = 0.5;
+                    }
+                  },
+                  duration: duration,
+                });
               }
-              // const duration = 300;
-              // setTimeout(() => {
-              //   loge(`click element 刷新界面= ${JSON.stringify(element)}`);
-              // }, duration);
-              // animate(this.context)({
-              //   animations: () => {
-              //     if (element.unfold) {
-              //       arrowImage.rotation = 0;
-              //     } else {
-              //       arrowImage.rotation = 0.5;
-              //     }
-              //     element.unfold = !element.unfold;
-              //   },
-              //   duration: duration,
-              // });
             }}
           >
             {arrowImage}
