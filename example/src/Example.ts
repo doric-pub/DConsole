@@ -17,6 +17,7 @@ import {
 } from "doric";
 import { openDConsole } from "./dConsole";
 import { CounterDemo } from "./CounterDemo";
+import { GestureContainerDemo } from "./GestureContainerDemo";
 
 @Entry
 class Example extends Panel {
@@ -32,7 +33,7 @@ class Example extends Panel {
         image: new AssetsResource("logo_doric.png"),
       }),
       text({
-        text: "Click to call native plugin",
+        text: "test LogModule",
         textSize: 20,
         backgroundColor: Color.parse("#70a1ff"),
         textColor: Color.WHITE,
@@ -45,7 +46,18 @@ class Example extends Panel {
         padding: { left: 20, right: 20, top: 20, bottom: 20 },
       }),
       text({
-        text: "State",
+        text: "test ElementModule",
+        textSize: 20,
+        backgroundColor: Color.parse("#70a1ff"),
+        textColor: Color.WHITE,
+        onClick: async () => {
+          navigator(this.context).push(GestureContainerDemo)
+        },
+        layoutConfig: layoutConfig().fit(),
+        padding: { left: 20, right: 20, top: 20, bottom: 20 },
+      }),
+      text({
+        text: "test StateModule",
         textSize: 20,
         backgroundColor: Color.parse("#70a1ff"),
         textColor: Color.WHITE,
