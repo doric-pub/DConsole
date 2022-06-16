@@ -17,6 +17,8 @@ import {
   NativeViewModel,
   Panel,
   ScaleType,
+  SlideItem,
+  Slider,
   Stack,
   Superview,
   Text,
@@ -40,6 +42,7 @@ export class ElementModule extends DCModule<Elements> {
   listRef = createRef<List>();
   deleteEleMap: Map<string, Elements> = new Map();
   isAnimating: boolean = false;
+  sliderRef = createRef<Slider>();
 
   title() {
     return "Element";
@@ -50,12 +53,40 @@ export class ElementModule extends DCModule<Elements> {
   }
 
   build(group: Group) {
-    group.backgroundColor = Color.YELLOW;
-    <List
+    group.backgroundColor = Color.WHITE;
+    const list = (
+      <List ref={this.listRef} layoutConfig={layoutConfig().most()}></List>
+    );
+    <Slider
+      ref={this.sliderRef}
       parent={group}
-      ref={this.listRef}
       layoutConfig={layoutConfig().most()}
-    ></List>;
+      backgroundColor={Color.WHITE}
+      itemCount={2}
+      onPageSlided={(index) => {
+        loge(`onPageSlided: ${index}`);
+      }}
+      renderPage={(index) => {
+        if (index == 0) {
+          return (
+            <SlideItem
+              layoutConfig={layoutConfig().most()}
+              identifier={"menu_cell"}
+            >
+              {list}
+            </SlideItem>
+          ) as SlideItem;
+        } else {
+          return (
+            <SlideItem
+              layoutConfig={layoutConfig().most()}
+              identifier={"detail_cell"}
+              backgroundColor={Color.RED}
+            ></SlideItem>
+          ) as SlideItem;
+        }
+      }}
+    ></Slider>;
   }
 
   onAttached(state: Elements) {
@@ -64,9 +95,8 @@ export class ElementModule extends DCModule<Elements> {
     const self = this;
     if (panel instanceof Panel) {
       const root = panel.getRootView();
-      this.recordView(root, 0);
+      self.recordView(root, 0);
     }
-
     this._state.length = 0;
     this._state = this._state.concat(this.allElements);
     this.updateState((s) => {
@@ -124,7 +154,9 @@ export class ElementModule extends DCModule<Elements> {
   }
 
   recordView(view: View, level: number) {
-    const nativeViewModel = view.nativeViewModel;
+    const lastModel = view.nativeViewModel;
+    const modelString = JSON.stringify(lastModel);
+    const nativeViewModel = JSON.parse(modelString);
     if (view.tag === identifier) {
       loge(
         `view.tag === ${view.tag},  ${nativeViewModel.type} (${nativeViewModel.id})`
@@ -138,15 +170,41 @@ export class ElementModule extends DCModule<Elements> {
       displayChildren: [],
     };
     this.allElements.push(ele);
-    let children = nativeViewModel.props["children"];
-    if (children && children instanceof Array && children.length > 0) {
-      (children as string[]).forEach((viewId) => {
-        let subView = (view as Superview).subviewById(viewId);
-        if (subView != undefined && view.tag != identifier) {
-          ele.displayChildren.push(subView.nativeViewModel.id);
-          this.recordView(subView, level + 1);
-        }
-      });
+    if (view instanceof Group) {
+      log(
+        `11111 ele[${level}]: type: ${view.viewType()} ${JSON.stringify(ele)}`
+      );
+      let children = nativeViewModel.props["children"];
+      if (children && children instanceof Array && children.length > 0) {
+        (children as string[]).forEach((viewId) => {
+          let subView = (view as Superview).subviewById(viewId);
+          if (subView != undefined && view.tag != identifier) {
+            ele.displayChildren.push(subView.nativeViewModel.id);
+            this.recordView(subView, level + 1);
+          }
+        });
+      }
+    } else if (view instanceof Superview) {
+      log(
+        `222222 >>> ele[${level}]: type: ${view.viewType()} ${JSON.stringify(
+          ele
+        )}`
+      );
+      let subviews = view.allSubviews();
+      if (subviews && subviews instanceof Array && subviews.length > 0) {
+        subviews.forEach((view) => {
+          if (view != undefined && view.tag != identifier) {
+            ele.displayChildren.push(view.nativeViewModel.id);
+            this.recordView(view, level + 1);
+          }
+        });
+      }
+    } else {
+      log(
+        `333333 >>> ele[${level}]: type: ${view.viewType()} ${JSON.stringify(
+          ele
+        )}`
+      );
     }
   }
 
@@ -168,6 +226,9 @@ export class ElementModule extends DCModule<Elements> {
       <ListItem
         layoutConfig={layoutConfig().mostWidth().fitHeight()}
         identifier={"element_cell"}
+        onClick={() => {
+          logw(`click at ${index}, element: ${JSON.stringify(element.data)}`);
+        }}
       >
         <HLayout
           layoutConfig={layoutConfig().mostWidth().fitHeight()}
@@ -179,7 +240,7 @@ export class ElementModule extends DCModule<Elements> {
             height={26}
             left={leftPadding}
             onClick={() => {
-              if ((!this.isAnimating) && arrowImage.hidden === false) {
+              if (!this.isAnimating && arrowImage.hidden === false) {
                 this.isAnimating = true;
                 const duration = 120;
                 setTimeout(() => {
@@ -223,9 +284,9 @@ export class ElementModule extends DCModule<Elements> {
   }
 
   onBind(state: Elements) {
-    // logw(
-    //   `onBind所有元素: ${this._state.length}:\n ${JSON.stringify(this._state)}`
-    // );
+    // this.sliderRef.apply({
+    //   itemCount: 2,
+    // });
     this.listRef.current.reset();
     this.listRef.current.apply({
       itemCount: this._state.length,

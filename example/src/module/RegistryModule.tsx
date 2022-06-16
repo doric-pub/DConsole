@@ -141,7 +141,7 @@ export class RegistryModule extends DCModule<number> {
       renderPage: (index) => {
         return (
           <SlideItem
-            layoutConfig={layoutConfig().mostWidth().mostHeight()}
+            layoutConfig={layoutConfig().most()}
             identifier={"slide_cell"}
             backgroundColor={Color.WHITE}
           >
