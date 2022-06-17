@@ -17,14 +17,16 @@ import {
   NativeViewModel,
   Panel,
   ScaleType,
+  Scroller,
   SlideItem,
   Slider,
   Stack,
   Superview,
   Text,
   View,
+  VLayout,
 } from "doric";
-import { identifier, purpRedColor } from "../utils";
+import { greenThemeColor, identifier, purpRedColor } from "../utils";
 import { DCModule } from "./dcModule";
 
 type ElementModel = {
@@ -43,6 +45,8 @@ export class ElementModule extends DCModule<Elements> {
   deleteEleMap: Map<string, Elements> = new Map();
   isAnimating: boolean = false;
   sliderRef = createRef<Slider>();
+  detailElement?: ElementModel = undefined;
+  textRef = createRef<Text>(); // 用于显示元素详情
 
   title() {
     return "Element";
@@ -63,6 +67,7 @@ export class ElementModule extends DCModule<Elements> {
       layoutConfig={layoutConfig().most()}
       backgroundColor={Color.WHITE}
       itemCount={2}
+      scrollable={false}
       onPageSlided={(index) => {
         loge(`onPageSlided: ${index}`);
       }}
@@ -81,12 +86,55 @@ export class ElementModule extends DCModule<Elements> {
             <SlideItem
               layoutConfig={layoutConfig().most()}
               identifier={"detail_cell"}
-              backgroundColor={Color.RED}
-            ></SlideItem>
+            >
+              {this.detailView()}
+            </SlideItem>
           ) as SlideItem;
         }
       }}
     ></Slider>;
+  }
+
+  detailView() {
+    var jsonString = "";
+    if (this.detailElement != undefined) {
+      jsonString = JSON.stringify(this.detailElement.data, undefined, 4);
+    }
+    return (
+      <VLayout layoutConfig={layoutConfig().most()}>
+        <Stack
+          layoutConfig={layoutConfig().mostWidth().justHeight()}
+          height={40}
+        >
+          <Text
+            layoutConfig={layoutConfig()
+              .fit()
+              .configAlignment(Gravity.Left.centerY())}
+            textColor={greenThemeColor}
+            padding={{ left: 5, right: 15, top: 5, bottom: 5 }}
+            onClick={() => {
+              this.sliderRef.current.slidePage(this.context, 0, true);
+            }}
+          >
+            返回
+          </Text>
+        </Stack>
+        <Scroller
+          layoutConfig={layoutConfig().most().configMargin({ top: 5 })}
+          backgroundColor={Color.WHITE}
+        >
+          <Text
+            ref={this.textRef}
+            layoutConfig={layoutConfig().mostWidth().fitHeight()}
+            maxLines={0}
+            textSize={12}
+            textAlignment={Gravity.Left}
+          >
+            {jsonString}
+          </Text>
+        </Scroller>
+      </VLayout>
+    );
   }
 
   onAttached(state: Elements) {
@@ -158,6 +206,7 @@ export class ElementModule extends DCModule<Elements> {
     const modelString = JSON.stringify(lastModel);
     const nativeViewModel = JSON.parse(modelString);
     if (view.tag === identifier) {
+      // 不要显示DConsole面板的元素
       loge(
         `view.tag === ${view.tag},  ${nativeViewModel.type} (${nativeViewModel.id})`
       );
@@ -227,7 +276,7 @@ export class ElementModule extends DCModule<Elements> {
         layoutConfig={layoutConfig().mostWidth().fitHeight()}
         identifier={"element_cell"}
         onClick={() => {
-          logw(`click at ${index}, element: ${JSON.stringify(element.data)}`);
+          this.displayElementDetail(element);
         }}
       >
         <HLayout
@@ -281,6 +330,17 @@ export class ElementModule extends DCModule<Elements> {
         />
       </ListItem>
     ) as ListItem;
+  }
+
+  displayElementDetail(element: ElementModel) {
+    logw(`click at element: ${JSON.stringify(element.data)}`);
+    this.detailElement = element;
+    this.textRef.current.text = JSON.stringify(
+      this.detailElement.data,
+      undefined,
+      4
+    );
+    this.sliderRef.current.slidePage(this.context, 1, true);
   }
 
   onBind(state: Elements) {
