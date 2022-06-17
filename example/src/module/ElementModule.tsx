@@ -11,9 +11,6 @@ import {
   layoutConfig,
   List,
   ListItem,
-  log,
-  loge,
-  logw,
   NativeViewModel,
   Panel,
   ScaleType,
@@ -68,9 +65,6 @@ export class ElementModule extends DCModule<Elements> {
       backgroundColor={Color.WHITE}
       itemCount={2}
       scrollable={false}
-      onPageSlided={(index) => {
-        loge(`onPageSlided: ${index}`);
-      }}
       renderPage={(index) => {
         if (index == 0) {
           return (
@@ -111,6 +105,8 @@ export class ElementModule extends DCModule<Elements> {
               .fit()
               .configAlignment(Gravity.Left.centerY())}
             textColor={greenThemeColor}
+            fontStyle={"bold"}
+            textSize={14}
             padding={{ left: 5, right: 15, top: 5, bottom: 5 }}
             onClick={() => {
               this.sliderRef.current.slidePage(this.context, 0, true);
@@ -120,7 +116,7 @@ export class ElementModule extends DCModule<Elements> {
           </Text>
         </Stack>
         <Scroller
-          layoutConfig={layoutConfig().most().configMargin({ top: 5 })}
+          layoutConfig={layoutConfig().most()}
           backgroundColor={Color.WHITE}
         >
           <Text
@@ -138,6 +134,13 @@ export class ElementModule extends DCModule<Elements> {
   }
 
   onAttached(state: Elements) {
+    this.onDestroy = () => {
+      this.deleteEleMap.clear();
+    };
+    this.readData();
+  }
+
+  readData() {
     this.allElements.length = 0;
     const panel = this.context.entity;
     const self = this;
@@ -147,40 +150,26 @@ export class ElementModule extends DCModule<Elements> {
     }
     this._state.length = 0;
     this._state = this._state.concat(this.allElements);
-    this.updateState((s) => {
-      logw(`最终所有元素: ${s.length}:\n ${JSON.stringify(s)}`);
-    });
-  }
-
-  findElementById(id: string, source: ElementModel[]) {
-    return source.find((value) => {
-      return value.data?.id === id;
-    });
+    this.updateState((s) => {});
   }
 
   ///  点击箭头 展开 or 收齐
   clickArrowImageAt(element: ElementModel) {
-    // loge(`click element 刷新界面 = ${JSON.stringify(element)}`);
     if (element.unfold) {
       // 收齐
       let fromIndex = this._state.indexOf(element);
       let level = element.level;
-      // logw(`收齐 fromIndex: ${fromIndex}, level: ${level}`);
       element.unfold = false;
       var toIndex = fromIndex;
       for (let index = fromIndex + 1; index < this._state.length; index++) {
         const ele = this._state[index];
         toIndex = index;
-        if (ele.level > level) {
-          // logw(`>> ele[${index}] : ${ele.data?.type}, toIndex=${toIndex}`);
-        } else {
-          // logw(`break ele[${index}] : ${ele.data?.type}, toIndex=${toIndex}`);
+        if (ele.level <= level) {
           toIndex--;
           break;
         }
       }
       let count = toIndex - fromIndex;
-      // logw(`收齐 toIndex: ${toIndex}, count = ${count}`);
       const deleteElements = this._state.splice(fromIndex + 1, count);
       if (element.data?.id) {
         this.deleteEleMap.set(element.data?.id, deleteElements);
@@ -193,7 +182,6 @@ export class ElementModule extends DCModule<Elements> {
       if (element.data?.id) {
         let insertElements = this.deleteEleMap.get(element.data?.id);
         if (insertElements) {
-          // logw(`插入: ${JSON.stringify(insertElements)}`);
           this._state.splice(fromIndex + 1, 0, ...insertElements);
           this.updateState((s) => {});
         }
@@ -207,9 +195,6 @@ export class ElementModule extends DCModule<Elements> {
     const nativeViewModel = JSON.parse(modelString);
     if (view.tag === identifier) {
       // 不要显示DConsole面板的元素
-      loge(
-        `view.tag === ${view.tag},  ${nativeViewModel.type} (${nativeViewModel.id})`
-      );
       return;
     }
     const ele: ElementModel = {
@@ -220,9 +205,6 @@ export class ElementModule extends DCModule<Elements> {
     };
     this.allElements.push(ele);
     if (view instanceof Group) {
-      log(
-        `11111 ele[${level}]: type: ${view.viewType()} ${JSON.stringify(ele)}`
-      );
       let children = nativeViewModel.props["children"];
       if (children && children instanceof Array && children.length > 0) {
         (children as string[]).forEach((viewId) => {
@@ -234,11 +216,6 @@ export class ElementModule extends DCModule<Elements> {
         });
       }
     } else if (view instanceof Superview) {
-      log(
-        `222222 >>> ele[${level}]: type: ${view.viewType()} ${JSON.stringify(
-          ele
-        )}`
-      );
       let subviews = view.allSubviews();
       if (subviews && subviews instanceof Array && subviews.length > 0) {
         subviews.forEach((view) => {
@@ -248,12 +225,6 @@ export class ElementModule extends DCModule<Elements> {
           }
         });
       }
-    } else {
-      log(
-        `333333 >>> ele[${level}]: type: ${view.viewType()} ${JSON.stringify(
-          ele
-        )}`
-      );
     }
   }
 
@@ -266,7 +237,7 @@ export class ElementModule extends DCModule<Elements> {
         width={10}
         height={10}
         scaleType={ScaleType.ScaleAspectFit}
-        image={new AssetsResource("console_arrow")}
+        image={new AssetsResource("console_arrow.jpg")}
         rotation={element.unfold ? 0.5 : 0}
         hidden={isHiddenArrow}
       ></Image>
@@ -333,7 +304,6 @@ export class ElementModule extends DCModule<Elements> {
   }
 
   displayElementDetail(element: ElementModel) {
-    logw(`click at element: ${JSON.stringify(element.data)}`);
     this.detailElement = element;
     this.textRef.current.text = JSON.stringify(
       this.detailElement.data,
@@ -344,9 +314,6 @@ export class ElementModule extends DCModule<Elements> {
   }
 
   onBind(state: Elements) {
-    // this.sliderRef.apply({
-    //   itemCount: 2,
-    // });
     this.listRef.current.reset();
     this.listRef.current.apply({
       itemCount: this._state.length,

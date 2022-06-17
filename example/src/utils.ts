@@ -2,6 +2,7 @@ import { Color } from "doric";
 
 export const identifier = "dConsole";
 export const purpRedColor = Color.parse("#812B80");
+export const greenThemeColor = Color.parse("#2ecc71");
 
 export const colors = [
     "#70a1ff",
