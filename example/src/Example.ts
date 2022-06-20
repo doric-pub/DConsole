@@ -7,7 +7,6 @@ import {
   text,
   Color,
   navbar,
-  modal,
   AssetsResource,
   image,
   log,

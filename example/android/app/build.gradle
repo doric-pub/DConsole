@@ -39,7 +39,7 @@ android {
 }
 
 afterEvaluate {
-    buildJSBundle.exec()
+//    buildJSBundle.exec()
 }
 
 task buildJSBundle(type: Exec) {

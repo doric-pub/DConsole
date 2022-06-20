@@ -11,6 +11,8 @@ import {
   layoutConfig,
   List,
   ListItem,
+  log,
+  loge,
   NativeViewModel,
   Panel,
   ScaleType,
@@ -28,9 +30,11 @@ import { DCModule } from "./dcModule";
 
 type ElementModel = {
   data?: NativeViewModel;
+  viewId: string;
   level: number;
   unfold: boolean;
   displayChildren: string[];
+  viewProperty: Object; // view的属性值
 };
 
 type Elements = ElementModel[];
@@ -92,7 +96,7 @@ export class ElementModule extends DCModule<Elements> {
   detailView() {
     var jsonString = "";
     if (this.detailElement != undefined) {
-      jsonString = JSON.stringify(this.detailElement.data, undefined, 4);
+      jsonString = this.detailDisplayString(this.detailElement);
     }
     return (
       <VLayout layoutConfig={layoutConfig().most()}>
@@ -142,6 +146,7 @@ export class ElementModule extends DCModule<Elements> {
 
   readData() {
     this.allElements.length = 0;
+    this.deleteEleMap.clear();
     const panel = this.context.entity;
     const self = this;
     if (panel instanceof Panel) {
@@ -150,7 +155,9 @@ export class ElementModule extends DCModule<Elements> {
     }
     this._state.length = 0;
     this._state = this._state.concat(this.allElements);
-    this.updateState((s) => {});
+    this.updateState((s) => {
+      log(`最终数据：${JSON.stringify(s)}`);
+    });
   }
 
   ///  点击箭头 展开 or 收齐
@@ -171,16 +178,20 @@ export class ElementModule extends DCModule<Elements> {
       }
       let count = toIndex - fromIndex;
       const deleteElements = this._state.splice(fromIndex + 1, count);
-      if (element.data?.id) {
-        this.deleteEleMap.set(element.data?.id, deleteElements);
+      let viewId =
+        element.viewId.length > 0 ? element.viewId : element.data?.id;
+      if (viewId) {
+        this.deleteEleMap.set(viewId, deleteElements);
       }
       this.updateState((s) => {});
     } else {
       // 展开
       element.unfold = true;
       let fromIndex = this._state.indexOf(element);
-      if (element.data?.id) {
-        let insertElements = this.deleteEleMap.get(element.data?.id);
+      let viewId =
+        element.viewId.length > 0 ? element.viewId : element.data?.id;
+      if (viewId) {
+        let insertElements = this.deleteEleMap.get(viewId);
         if (insertElements) {
           this._state.splice(fromIndex + 1, 0, ...insertElements);
           this.updateState((s) => {});
@@ -190,6 +201,7 @@ export class ElementModule extends DCModule<Elements> {
   }
 
   recordView(view: View, level: number) {
+    // nativeViewModel暂时先记录
     const lastModel = view.nativeViewModel;
     const modelString = JSON.stringify(lastModel);
     const nativeViewModel = JSON.parse(modelString);
@@ -197,18 +209,34 @@ export class ElementModule extends DCModule<Elements> {
       // 不要显示DConsole面板的元素
       return;
     }
+    let keys = Reflect.ownKeys(view);
+    const propMap = new Map();
+    keys.forEach((key) => {
+      let value = Reflect.get(view, key);
+      propMap.set(key, value);
+    });
+    var viewId = "";
+    if (propMap.has("viewId")) {
+      viewId = propMap.get("viewId");
+      loge(`viewId: ${viewId}`);
+    }
     const ele: ElementModel = {
       data: nativeViewModel,
+      viewId,
       level: level,
       unfold: true,
       displayChildren: [],
+      viewProperty: Object.fromEntries(propMap),
     };
     this.allElements.push(ele);
+
     if (view instanceof Group) {
-      let children = nativeViewModel.props["children"];
+      if (!propMap.has("children")) {
+        return;
+      }
+      let children = propMap.get("children");
       if (children && children instanceof Array && children.length > 0) {
-        (children as string[]).forEach((viewId) => {
-          let subView = (view as Superview).subviewById(viewId);
+        children.forEach((subView) => {
           if (subView != undefined && view.tag != identifier) {
             ele.displayChildren.push(subView.nativeViewModel.id);
             this.recordView(subView, level + 1);
@@ -303,17 +331,37 @@ export class ElementModule extends DCModule<Elements> {
     ) as ListItem;
   }
 
-  displayElementDetail(element: ElementModel) {
+  private displayElementDetail(element: ElementModel) {
     this.detailElement = element;
-    this.textRef.current.text = JSON.stringify(
-      this.detailElement.data,
-      undefined,
-      4
-    );
+    this.textRef.current.text = this.detailDisplayString(element);
     this.sliderRef.current.slidePage(this.context, 1, true);
   }
 
+  private detailDisplayString(element: ElementModel): string {
+    let arr: Object[] = [];
+    const detailStr = JSON.stringify(
+      element.viewProperty,
+      (key, value) => {
+        // fix: TypeError: JSON.stringify cannot serialize cyclic structures.
+        if (value != null && typeof value == "object") {
+          if (arr.indexOf(value) >= 0) {
+            return;
+          }
+          arr.push(value);
+        }
+        // "children" 数据太长，影响阅读，暂时不展示children信息
+        if (key === "children") return;
+        return value;
+      },
+      4
+    );
+    return detailStr;
+  }
+
   onBind(state: Elements) {
+    this.sliderRef.current.apply({
+      itemCount: 2,
+    });
     this.listRef.current.reset();
     this.listRef.current.apply({
       itemCount: this._state.length,
