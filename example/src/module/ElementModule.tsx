@@ -1,21 +1,16 @@
 import {
   animate,
-  AssetsResource,
   Color,
   createRef,
   Gravity,
   Group,
   HLayout,
-  Image,
   jsx,
   layoutConfig,
   List,
   ListItem,
-  log,
-  loge,
   NativeViewModel,
   Panel,
-  ScaleType,
   Scroller,
   SlideItem,
   Slider,
@@ -155,9 +150,7 @@ export class ElementModule extends DCModule<Elements> {
     }
     this._state.length = 0;
     this._state = this._state.concat(this.allElements);
-    this.updateState((s) => {
-      log(`最终数据：${JSON.stringify(s)}`);
-    });
+    this.updateState((s) => {});
   }
 
   ///  点击箭头 展开 or 收齐
@@ -218,7 +211,6 @@ export class ElementModule extends DCModule<Elements> {
     var viewId = "";
     if (propMap.has("viewId")) {
       viewId = propMap.get("viewId");
-      loge(`viewId: ${viewId}`);
     }
     const ele: ElementModel = {
       data: nativeViewModel,
@@ -260,15 +252,17 @@ export class ElementModule extends DCModule<Elements> {
     const leftPadding = element.level * 10;
     const isHiddenArrow = element.displayChildren.length === 0;
     const arrowImage = (
-      <Image
-        layoutConfig={layoutConfig().just().configAlignment(Gravity.Center)}
-        width={10}
-        height={10}
-        scaleType={ScaleType.ScaleAspectFit}
-        image={new AssetsResource("console_arrow.jpg")}
-        rotation={element.unfold ? 0.5 : 0}
+      <Text
+        layoutConfig={layoutConfig()
+          .fit()
+          .configAlignment(Gravity.Center)
+          .configMargin({ right: -4 })}
         hidden={isHiddenArrow}
-      ></Image>
+        textSize={11}
+        rotation={element.unfold ? 0 : 1.5}
+      >
+        ▼
+      </Text>
     );
     return (
       <ListItem
@@ -284,7 +278,7 @@ export class ElementModule extends DCModule<Elements> {
         >
           <Stack
             layoutConfig={layoutConfig().just()}
-            width={26}
+            width={24}
             height={26}
             left={leftPadding}
             onClick={() => {
@@ -298,9 +292,9 @@ export class ElementModule extends DCModule<Elements> {
                 animate(this.context)({
                   animations: () => {
                     if (element.unfold) {
-                      arrowImage.rotation = 0;
+                      arrowImage.rotation = 1.5;
                     } else {
-                      arrowImage.rotation = 0.5;
+                      arrowImage.rotation = 0;
                     }
                   },
                   duration: duration,
@@ -349,8 +343,8 @@ export class ElementModule extends DCModule<Elements> {
           }
           arr.push(value);
         }
-        // "children" 数据太长，影响阅读，暂时不展示children信息
-        if (key === "children") return;
+        // "children" 数据太长，影响阅读，暂时不展示children、content信息
+        if (key === "children" || key === "content") return;
         return value;
       },
       4
