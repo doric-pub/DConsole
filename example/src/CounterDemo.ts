@@ -1,5 +1,6 @@
 import { Color, Gravity, Group, layoutConfig, log, stack, Text, text, ViewHolder, ViewModel, VMPanel } from "doric";
-import { openDConsole } from "./dConsole";
+import {openDConsole} from "dconsole"
+
 
 interface CountModel {
     count: number;

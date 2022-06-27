@@ -24,11 +24,11 @@ import {
   keyboard,
   notification,
 } from "doric";
-import { DCModule } from "./module/dcModule";
-import { ElementModule } from "./module/ElementModule";
-import { LogModule } from "./module/LogModule";
-import { RegistryModule } from "./module/RegistryModule";
-import { StateModule } from "./module/StateModule";
+import { DCModule } from "./dcModule";
+import { ElementModule } from "./ElementModule";
+import { LogModule } from "./LogModule";
+import { RegistryModule } from "./RegistryModule";
+import { StateModule } from "./StateModule";
 import { donConsoleNotiName, identifier } from "./utils";
 
 const DCM: ClassType<DCModule<any>>[] = [LogModule, ElementModule, StateModule, RegistryModule];

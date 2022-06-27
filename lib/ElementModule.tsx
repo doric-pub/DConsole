@@ -26,7 +26,7 @@ import {
   greenThemeColor,
   identifier,
   purpRedColor,
-} from "../utils";
+} from "./utils";
 import { DCModule } from "./dcModule";
 
 type ElementModel = {

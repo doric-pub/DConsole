@@ -14,7 +14,7 @@ import {
   logw,
   navigator,
 } from "doric";
-import { openDConsole } from "./dConsole";
+import { openDConsole } from "dConsole";
 import { CounterDemo } from "./CounterDemo";
 import { GestureContainerDemo } from "./GestureContainerDemo";
 

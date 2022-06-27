@@ -22,17 +22,12 @@ import { DCModule } from "./dcModule";
 import { Map } from "immutable";
 import Immutable from "immutable";
 
-// type StateModel = {
-//     action?: string,
-//     value?: any,
-// }[];
-
 type StateModel = Map<string, any>[];
 
 export class StateModule extends DCModule<StateModel> {
-  history: Map<string, any>[] = []; // state状态记录容器
+  history: Map<string, any>[] = [];
   listRef = createRef<List>();
-  recordMax = 100; // state状态记录的最大条数
+  recordMax = 100;
 
   title(): string {
     return "State";
@@ -197,8 +192,6 @@ export class StateModule extends DCModule<StateModel> {
   }
 
   saveStateToHistory(stateObj: Object, s: StateModel, action: string) {
-    // const string = JSON.stringify(stateObj);
-    // const obj = JSON.parse(string);
     const immutableMap = Immutable.fromJS(stateObj);
     const data = Immutable.Map({ action: action, value: immutableMap });
     this.history.push(data);

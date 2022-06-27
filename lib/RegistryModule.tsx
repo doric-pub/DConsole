@@ -19,7 +19,7 @@ import {
   VLayout,
 } from "doric";
 import { DCModule } from "./dcModule";
-import { dconsolePlugin } from "dconsole";
+import { dconsolePlugin } from "./DConsolePlugin";
 
 export class RegistryModule extends DCModule<number> {
   listRef = createRef<List>();
@@ -75,7 +75,11 @@ export class RegistryModule extends DCModule<number> {
     this.datas = this.datas.concat([this.libraries, this.plugins, this.nodes]);
     this.onBind(this._state);
     setTimeout(() => {
-      this.sliderRef.current.slidePage(this.context, this.currentSelectIndex, true);
+      this.sliderRef.current.slidePage(
+        this.context,
+        this.currentSelectIndex,
+        true
+      );
     }, 500);
   }
 

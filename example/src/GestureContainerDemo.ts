@@ -13,8 +13,8 @@ import {
   text,
   SwipeOrientation,
 } from "doric";
-import { colors } from "./utils";
-import { openDConsole } from "./dConsole";
+const colorHex = Color.parse("#eb4d4b");
+import { openDConsole } from "dConsole";
 
 @Entry
 export class GestureContainerDemo extends Panel {
@@ -56,7 +56,7 @@ export class GestureContainerDemo extends Panel {
               layoutConfig: layoutConfig().mostWidth(),
               textSize: 30,
               textColor: Color.WHITE,
-              backgroundColor: colors[5],
+              backgroundColor: colorHex,
               textAlignment: gravity().center(),
               height: 50,
             }),
@@ -98,7 +98,7 @@ export class GestureContainerDemo extends Panel {
               layoutConfig: layoutConfig().mostWidth(),
               textSize: 20,
               textColor: Color.WHITE,
-              backgroundColor: colors[5],
+              backgroundColor: colorHex,
               textAlignment: gravity().center(),
               height: 50,
             }),
@@ -130,7 +130,7 @@ export class GestureContainerDemo extends Panel {
               layoutConfig: layoutConfig().mostWidth(),
               textSize: 30,
               textColor: Color.WHITE,
-              backgroundColor: colors[5],
+              backgroundColor: colorHex,
               textAlignment: gravity().center(),
               height: 50,
             }),
@@ -157,7 +157,7 @@ export class GestureContainerDemo extends Panel {
               layoutConfig: layoutConfig().mostWidth(),
               textSize: 30,
               textColor: Color.WHITE,
-              backgroundColor: colors[5],
+              backgroundColor: colorHex,
               textAlignment: gravity().center(),
               height: 50,
             }),
@@ -184,7 +184,7 @@ export class GestureContainerDemo extends Panel {
               layoutConfig: layoutConfig().mostWidth(),
               textSize: 30,
               textColor: Color.WHITE,
-              backgroundColor: colors[5],
+              backgroundColor: colorHex,
               textAlignment: gravity().center(),
               height: 50,
             }),
@@ -213,7 +213,7 @@ export class GestureContainerDemo extends Panel {
               layoutConfig: layoutConfig().mostWidth(),
               textSize: 30,
               textColor: Color.WHITE,
-              backgroundColor: colors[5],
+              backgroundColor: colorHex,
               textAlignment: gravity().center(),
               height: 50,
             }),

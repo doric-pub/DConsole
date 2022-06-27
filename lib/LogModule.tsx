@@ -96,7 +96,7 @@ export class LogModule extends DCModule<LogModel> {
     const nativeLog = global["nativeLog"];
     const self = this;
     global["nativeLog"] = function () {
-      const args = [];
+      const args:any[] = [];
       for (let i = 0; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
