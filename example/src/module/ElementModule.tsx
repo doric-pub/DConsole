@@ -9,9 +9,6 @@ import {
   layoutConfig,
   List,
   ListItem,
-  log,
-  loge,
-  logw,
   NativeViewModel,
   notification,
   Panel,
@@ -64,11 +61,10 @@ export class ElementModule extends DCModule<Elements> {
   }
 
   onShow(): void {
-    log(`onShowonShowonShowonShowonShow1`);
     if (this.isShowing === true && this.allElements.length > 0) {
       return;
     }
-    // this.realBuild();
+    this.realBuild();
     this.readData();
   }
 
@@ -76,6 +72,9 @@ export class ElementModule extends DCModule<Elements> {
     if (!this.realGroup) return;
     this.realGroup.backgroundColor = Color.WHITE;
     this.realGroup.removeAllChildren();
+    const list = (
+      <List ref={this.listRef} layoutConfig={layoutConfig().most()}></List>
+    );
     <Slider
       ref={this.sliderRef}
       parent={this.realGroup}
@@ -90,10 +89,7 @@ export class ElementModule extends DCModule<Elements> {
               layoutConfig={layoutConfig().most()}
               identifier={"menu_cell"}
             >
-              <List
-                ref={this.listRef}
-                layoutConfig={layoutConfig().most()}
-              ></List>
+              {list}
             </SlideItem>
           ) as SlideItem;
         } else {
@@ -112,7 +108,6 @@ export class ElementModule extends DCModule<Elements> {
 
   build(group: Group) {
     this.realGroup = group;
-    this.realBuild();
   }
 
   detailView() {
@@ -296,14 +291,6 @@ export class ElementModule extends DCModule<Elements> {
   cellWith(element: ElementModel, index: number) {
     const leftPadding = element.level * 10;
     const isHiddenArrow = element.displayChildren.length === 0;
-    const rotation =
-      Environment.platform === "Android"
-        ? element.unfold
-          ? 2
-          : 1.5
-        : element.unfold
-        ? 0
-        : 1.5;
     const arrowImage = (
       <Text
         layoutConfig={layoutConfig()
@@ -311,8 +298,8 @@ export class ElementModule extends DCModule<Elements> {
           .configAlignment(Gravity.Center)
           .configMargin({ right: -4 })}
         hidden={isHiddenArrow}
-        textSize={11}
-        rotation={rotation}
+        textSize={10}
+        rotation={element.unfold ? 2 : 1.5}
       >
         ▼
       </Text>
@@ -334,21 +321,16 @@ export class ElementModule extends DCModule<Elements> {
             width={24}
             height={26}
             left={leftPadding}
-            onClick={ async () => {
+            onClick={async () => {
               if (!this.isAnimating && arrowImage.hidden === false) {
                 this.isAnimating = true;
-                const duration = 320;
+                const duration = 120;
                 await animate(this.context)({
                   animations: () => {
-                    if (Environment.platform === "Android") {
-                      arrowImage.rotation = element.unfold ? 1.5 : 2;
-                    } else {
-                      arrowImage.rotation = element.unfold ? 1.5 : 0;
-                    }
+                    arrowImage.rotation = element.unfold ? 1.5 : 2;
                   },
                   duration: duration,
                 });
-                loge(`clickArrowImageAt`);
                 this.clickArrowImageAt(element);
                 this.isAnimating = false;
               }
@@ -405,21 +387,18 @@ export class ElementModule extends DCModule<Elements> {
   }
 
   onBind(state: Elements) {
-    logw(`onBindonBindonBindonBindonBindonBind`);
-    if(this.sliderRef != undefined) {
+    if (this.sliderRef) {
       this.sliderRef.current.apply({
         itemCount: 2,
       });
     }
-    if (this.listRef != undefined) {
-      this.listRef.current.reset();
-      this.listRef.current.apply({
-        itemCount: this._state.length,
-        renderItem: (i) => {
-          const element = this._state[i];
-          return this.cellWith(element, i);
-        },
-      });
-    }
+    this.listRef.current.reset();
+    this.listRef.current.apply({
+      itemCount: this._state.length,
+      renderItem: (i) => {
+        const element = this._state[i];
+        return this.cellWith(element, i);
+      },
+    });
   }
 }

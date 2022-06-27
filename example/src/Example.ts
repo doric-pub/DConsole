@@ -21,10 +21,10 @@ import { GestureContainerDemo } from "./GestureContainerDemo";
 @Entry
 class Example extends Panel {
   onCreate() {
-    // openDConsole(this.context);
+    openDConsole(this.context);
   }
   onShow() {
-    navbar(context).setTitle("Example4");
+    navbar(context).setTitle("Example");
   }
   build(rootView: Group) {
     vlayout([
