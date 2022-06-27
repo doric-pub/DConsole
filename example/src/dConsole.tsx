@@ -22,13 +22,14 @@ import {
   ClassType,
   View,
   keyboard,
+  notification,
 } from "doric";
 import { DCModule } from "./module/dcModule";
 import { ElementModule } from "./module/ElementModule";
 import { LogModule } from "./module/LogModule";
 import { RegistryModule } from "./module/RegistryModule";
 import { StateModule } from "./module/StateModule";
-import { identifier } from "./utils";
+import { donConsoleNotiName, identifier } from "./utils";
 
 const DCM: ClassType<DCModule<any>>[] = [LogModule, ElementModule, StateModule, RegistryModule];
 
@@ -47,7 +48,7 @@ class DCVH extends ViewHolder {
       ref={this.containerRef}
       tag={identifier}
       hidden={true}
-      alpha={0.5}
+      alpha={0.8}
       parent={root}
       layoutConfig={layoutConfig().most()}
       backgroundColor={Color.parse("#bdc3c7")}
@@ -90,6 +91,10 @@ class DCVM extends ViewModel<DCModel, DCVH> {
 
   onAttached(state: DCModel, vh: DCVH) {
     vh.containerRef.current.onClick = () => {
+      notification(this.context).publish({biz:identifier, name: donConsoleNotiName, data: {
+        isShowing: false,
+        id:this.context.id
+      }});
       this.updateState((state) => (state.show = false));
     };
     state.dcModules.forEach((e) => {
@@ -167,6 +172,10 @@ export function openDConsole(context: BridgeContext) {
           bottom: 80,
         })}
       onClick={() => {
+        notification(context).publish({biz:identifier, name: donConsoleNotiName, data: {
+          isShowing: true,
+          id:context.id
+        }});
         vm.updateState((state) => (state.show = true));
       }}
       onTouchDown={() => {

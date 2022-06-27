@@ -1,6 +1,7 @@
 import { Color } from "doric";
 
 export const identifier = "dConsole";
+export const donConsoleNotiName = "donConsoleNotiName";
 export const purpRedColor = Color.parse("#812B80");
 export const greenThemeColor = Color.parse("#2ecc71");
 

@@ -9,7 +9,11 @@ import {
   layoutConfig,
   List,
   ListItem,
+  log,
+  loge,
+  logw,
   NativeViewModel,
+  notification,
   Panel,
   Scroller,
   SlideItem,
@@ -20,7 +24,12 @@ import {
   View,
   VLayout,
 } from "doric";
-import { greenThemeColor, identifier, purpRedColor } from "../utils";
+import {
+  donConsoleNotiName,
+  greenThemeColor,
+  identifier,
+  purpRedColor,
+} from "../utils";
 import { DCModule } from "./dcModule";
 
 type ElementModel = {
@@ -35,14 +44,16 @@ type ElementModel = {
 type Elements = ElementModel[];
 
 export class ElementModule extends DCModule<Elements> {
-  // 所有的元素
   allElements: ElementModel[] = [];
   listRef = createRef<List>();
   deleteEleMap: Map<string, Elements> = new Map();
   isAnimating: boolean = false;
   sliderRef = createRef<Slider>();
   detailElement?: ElementModel = undefined;
-  textRef = createRef<Text>(); // 用于显示元素详情
+  textRef = createRef<Text>();
+  realGroup?: Group;
+  subscribeId?: string;
+  isShowing: boolean = true;
 
   title() {
     return "Element";
@@ -52,18 +63,26 @@ export class ElementModule extends DCModule<Elements> {
     return [];
   }
 
-  build(group: Group) {
-    group.backgroundColor = Color.WHITE;
-    const list = (
-      <List ref={this.listRef} layoutConfig={layoutConfig().most()}></List>
-    );
+  onShow(): void {
+    log(`onShowonShowonShowonShowonShow1`);
+    if (this.isShowing === true && this.allElements.length > 0) {
+      return;
+    }
+    // this.realBuild();
+    this.readData();
+  }
+
+  realBuild() {
+    if (!this.realGroup) return;
+    this.realGroup.backgroundColor = Color.WHITE;
+    this.realGroup.removeAllChildren();
     <Slider
       ref={this.sliderRef}
-      parent={group}
+      parent={this.realGroup}
       layoutConfig={layoutConfig().most()}
       backgroundColor={Color.WHITE}
       itemCount={2}
-      scrollable={false}
+      scrollable={true}
       renderPage={(index) => {
         if (index == 0) {
           return (
@@ -71,7 +90,10 @@ export class ElementModule extends DCModule<Elements> {
               layoutConfig={layoutConfig().most()}
               identifier={"menu_cell"}
             >
-              {list}
+              <List
+                ref={this.listRef}
+                layoutConfig={layoutConfig().most()}
+              ></List>
             </SlideItem>
           ) as SlideItem;
         } else {
@@ -86,6 +108,11 @@ export class ElementModule extends DCModule<Elements> {
         }
       }}
     ></Slider>;
+  }
+
+  build(group: Group) {
+    this.realGroup = group;
+    this.realBuild();
   }
 
   detailView() {
@@ -133,10 +160,29 @@ export class ElementModule extends DCModule<Elements> {
   }
 
   onAttached(state: Elements) {
+    notification(this.context)
+      .subscribe({
+        biz: identifier,
+        name: donConsoleNotiName,
+        callback: (data) => {
+          const id = data.id;
+          if (id != undefined && id === this.context.id) {
+            if (data.isShowing === false) {
+              this.deleteEleMap.clear();
+              this.isShowing = false;
+            }
+          }
+        },
+      })
+      .then((e) => {
+        this.subscribeId = e;
+      });
     this.onDestroy = () => {
+      if (this.subscribeId) {
+        notification(this.context).unsubscribe(this.subscribeId);
+      }
       this.deleteEleMap.clear();
     };
-    this.readData();
   }
 
   readData() {
@@ -202,9 +248,8 @@ export class ElementModule extends DCModule<Elements> {
       // 不要显示DConsole面板的元素
       return;
     }
-    let keys = Reflect.ownKeys(view);
     const propMap = new Map();
-    keys.forEach((key) => {
+    Reflect.ownKeys(view).forEach((key) => {
       let value = Reflect.get(view, key);
       propMap.set(key, value);
     });
@@ -251,6 +296,14 @@ export class ElementModule extends DCModule<Elements> {
   cellWith(element: ElementModel, index: number) {
     const leftPadding = element.level * 10;
     const isHiddenArrow = element.displayChildren.length === 0;
+    const rotation =
+      Environment.platform === "Android"
+        ? element.unfold
+          ? 2
+          : 1.5
+        : element.unfold
+        ? 0
+        : 1.5;
     const arrowImage = (
       <Text
         layoutConfig={layoutConfig()
@@ -259,7 +312,7 @@ export class ElementModule extends DCModule<Elements> {
           .configMargin({ right: -4 })}
         hidden={isHiddenArrow}
         textSize={11}
-        rotation={element.unfold ? 0 : 1.5}
+        rotation={rotation}
       >
         ▼
       </Text>
@@ -281,24 +334,23 @@ export class ElementModule extends DCModule<Elements> {
             width={24}
             height={26}
             left={leftPadding}
-            onClick={() => {
+            onClick={ async () => {
               if (!this.isAnimating && arrowImage.hidden === false) {
                 this.isAnimating = true;
-                const duration = 120;
-                setTimeout(() => {
-                  this.clickArrowImageAt(element);
-                  this.isAnimating = false;
-                }, duration);
-                animate(this.context)({
+                const duration = 320;
+                await animate(this.context)({
                   animations: () => {
-                    if (element.unfold) {
-                      arrowImage.rotation = 1.5;
+                    if (Environment.platform === "Android") {
+                      arrowImage.rotation = element.unfold ? 1.5 : 2;
                     } else {
-                      arrowImage.rotation = 0;
+                      arrowImage.rotation = element.unfold ? 1.5 : 0;
                     }
                   },
                   duration: duration,
                 });
+                loge(`clickArrowImageAt`);
+                this.clickArrowImageAt(element);
+                this.isAnimating = false;
               }
             }}
           >
@@ -353,16 +405,21 @@ export class ElementModule extends DCModule<Elements> {
   }
 
   onBind(state: Elements) {
-    this.sliderRef.current.apply({
-      itemCount: 2,
-    });
-    this.listRef.current.reset();
-    this.listRef.current.apply({
-      itemCount: this._state.length,
-      renderItem: (i) => {
-        const element = this._state[i];
-        return this.cellWith(element, i);
-      },
-    });
+    logw(`onBindonBindonBindonBindonBindonBind`);
+    if(this.sliderRef != undefined) {
+      this.sliderRef.current.apply({
+        itemCount: 2,
+      });
+    }
+    if (this.listRef != undefined) {
+      this.listRef.current.reset();
+      this.listRef.current.apply({
+        itemCount: this._state.length,
+        renderItem: (i) => {
+          const element = this._state[i];
+          return this.cellWith(element, i);
+        },
+      });
+    }
   }
 }
