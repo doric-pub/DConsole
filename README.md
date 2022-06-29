@@ -10,7 +10,7 @@
 
 详情可参考下方截图
 
-  <img src="../main/images/element.gif" width="25%">
+<img src="../main/images/element.gif" width="50%"/>
 
 
 ### Usage
@@ -46,11 +46,11 @@ dependencies {
 }
 ```
 
-# Requirements
+### Requirements
 
 ```
 "dependencies": {
-      "doric": ">=0.10.16",
+      "doric": "^0.10.16",
 },
 ```
 
@@ -58,16 +58,16 @@ dependencies {
 
 * **Log**
 
- | iOS | Android |
+| iOS | Android |
 | ---- | ---- |
-| !<img src="../main/images/log1.png" height="500px"/> | <img src="../main/images/log2.png" height="500px"/>|
+| !<img src="../main/images/log1.png" height="500px"/> | <img src="../main/images/log2.jpg" height="500px"/>|
 
 * **Registry**
 
- | iOS | Android |
+| iOS | Android |
 | ---- | ---- |
-| !<img src="../main/images/plugin1.png" height="500px"/> | <img src="../main/images/plugin2.png" height="500px"/>|
+| !<img src="../main/images/plugin1.PNG" height="500px"/> | <img src="../main/images/plugin2.jpg" height="500px"/>|
 
 * **State**
 
-  <img src="../main/images/state1.PNG" width="25%">
+<img src="../main/images/state1.PNG" width="50%"/>
