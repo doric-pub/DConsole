@@ -42,7 +42,6 @@ export class StateModule extends DCModule<StateModel> {
   }
 
   build(group: Group): void {
-    group.backgroundColor = Color.parse("#ecf0f1");
     <VLayout parent={group} layoutConfig={layoutConfig().most()}>
       <List
         layoutConfig={layoutConfig().mostWidth().justHeight().configWeight(1)}

@@ -70,7 +70,6 @@ export class ElementModule extends DCModule<Elements> {
 
   realBuild() {
     if (!this.realGroup) return;
-    this.realGroup.backgroundColor = Color.WHITE;
     this.realGroup.removeAllChildren();
     const list = (
       <List ref={this.listRef} layoutConfig={layoutConfig().most()}></List>
@@ -377,8 +376,8 @@ export class ElementModule extends DCModule<Elements> {
           }
           arr.push(value);
         }
-        // "children" 数据太长，影响阅读，暂时不展示children、content信息
-        if (key === "children" || key === "content") return;
+        // "children" 数据太长，影响阅读，暂时不展示children、content、superview等信息
+        if (key === "children" || key === "content" || key === "superview") return;
         return value;
       },
       4

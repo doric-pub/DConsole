@@ -1,6 +1,5 @@
 package pub.doric.library;
 
-import android.util.Log;
 import com.github.pengfeizhou.jscore.JavaValue;
 import org.json.JSONArray;
 import java.lang.ref.WeakReference;

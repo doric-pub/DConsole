@@ -31,7 +31,12 @@ import { RegistryModule } from "./RegistryModule";
 import { StateModule } from "./StateModule";
 import { donConsoleNotiName, identifier } from "./utils";
 
-const DCM: ClassType<DCModule<any>>[] = [LogModule, ElementModule, StateModule, RegistryModule];
+const DCM: ClassType<DCModule<any>>[] = [
+  LogModule,
+  ElementModule,
+  StateModule,
+  RegistryModule,
+];
 
 type DCModel = {
   show: boolean;
@@ -91,10 +96,14 @@ class DCVM extends ViewModel<DCModel, DCVH> {
 
   onAttached(state: DCModel, vh: DCVH) {
     vh.containerRef.current.onClick = () => {
-      notification(this.context).publish({biz:identifier, name: donConsoleNotiName, data: {
-        isShowing: false,
-        id:this.context.id
-      }});
+      notification(this.context).publish({
+        biz: identifier,
+        name: donConsoleNotiName,
+        data: {
+          isShowing: false,
+          id: this.context.id,
+        },
+      });
       this.updateState((state) => (state.show = false));
     };
     state.dcModules.forEach((e) => {
@@ -103,6 +112,7 @@ class DCVM extends ViewModel<DCModel, DCVH> {
           layoutConfig={layoutConfig().fitWidth().mostHeight()}
           padding={{ left: 20, right: 20 }}
           backgroundColor={Color.WHITE}
+          textColor={Color.BLACK}
           onClick={() => {
             this.updateState((state) => (state.selectedModule = e));
           }}
@@ -110,7 +120,12 @@ class DCVM extends ViewModel<DCModel, DCVH> {
           {e.title()}
         </Text>
       );
-      const content = <Stack layoutConfig={layoutConfig().most()} />;
+      const content = (
+        <Stack
+          layoutConfig={layoutConfig().most()}
+          backgroundColor={Color.parse("#ecf0f1")}
+        />
+      );
       vh.tabRef.current.addChild(title);
       vh.contentRef.current.addChild(content);
       this.vRecord.set(e, { title, content });
@@ -172,10 +187,14 @@ export function openDConsole(context: BridgeContext) {
           bottom: 80,
         })}
       onClick={() => {
-        notification(context).publish({biz:identifier, name: donConsoleNotiName, data: {
-          isShowing: true,
-          id:context.id
-        }});
+        notification(context).publish({
+          biz: identifier,
+          name: donConsoleNotiName,
+          data: {
+            isShowing: true,
+            id: context.id,
+          },
+        });
         vm.updateState((state) => (state.show = true));
       }}
       onTouchDown={() => {

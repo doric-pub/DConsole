@@ -42,12 +42,11 @@ export class RegistryModule extends DCModule<number> {
   }
 
   build(group: Group): void {
-    group.backgroundColor = Color.parse("#ecf0f1");
     <VLayout parent={group} layoutConfig={layoutConfig().most()}>
       <Slider
         ref={this.sliderRef}
         layoutConfig={layoutConfig().mostWidth().justHeight().configWeight(1)}
-        backgroundColor={Color.YELLOW}
+        backgroundColor={Color.WHITE}
       ></Slider>
       <FlexLayout
         layoutConfig={layoutConfig()

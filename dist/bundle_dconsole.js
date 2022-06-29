@@ -20,7 +20,7 @@ function dconsolePlugin(context) {
 
 const identifier = "dConsole";
 const donConsoleNotiName = "donConsoleNotiName";
-const purpRedColor = doric.Color.parse("#812B80");
+const purpRedColor = doric.Color.parse("#D608D6");
 const greenThemeColor = doric.Color.parse("#2ecc71");
 [
     "#70a1ff",
@@ -85,7 +85,6 @@ class ElementModule extends DCModule {
     realBuild() {
         if (!this.realGroup)
             return;
-        this.realGroup.backgroundColor = doric.Color.WHITE;
         this.realGroup.removeAllChildren();
         const list = (doric.jsx.createElement(doric.List, { ref: this.listRef, layoutConfig: doric.layoutConfig().most() }));
         doric.jsx.createElement(doric.Slider, { ref: this.sliderRef, parent: this.realGroup, layoutConfig: doric.layoutConfig().most(), backgroundColor: doric.Color.WHITE, itemCount: 2, scrollable: true, renderPage: (index) => {
@@ -289,8 +288,8 @@ class ElementModule extends DCModule {
                 }
                 arr.push(value);
             }
-            // "children" 数据太长，影响阅读，暂时不展示children、content信息
-            if (key === "children" || key === "content")
+            // "children" 数据太长，影响阅读，暂时不展示children、content、superview等信息
+            if (key === "children" || key === "content" || key === "superview")
                 return;
             return value;
         }, 4);
@@ -448,9 +447,8 @@ class RegistryModule extends DCModule {
         return 0;
     }
     build(group) {
-        group.backgroundColor = doric.Color.parse("#ecf0f1");
         doric.jsx.createElement(doric.VLayout, { parent: group, layoutConfig: doric.layoutConfig().most() },
-            doric.jsx.createElement(doric.Slider, { ref: this.sliderRef, layoutConfig: doric.layoutConfig().mostWidth().justHeight().configWeight(1), backgroundColor: doric.Color.YELLOW }),
+            doric.jsx.createElement(doric.Slider, { ref: this.sliderRef, layoutConfig: doric.layoutConfig().mostWidth().justHeight().configWeight(1), backgroundColor: doric.Color.WHITE }),
             doric.jsx.createElement(doric.FlexLayout, { layoutConfig: doric.layoutConfig()
                     .mostWidth()
                     .justHeight()
@@ -6581,7 +6579,6 @@ class StateModule extends DCModule {
         this.resetList();
     }
     build(group) {
-        group.backgroundColor = doric.Color.parse("#ecf0f1");
         doric.jsx.createElement(doric.VLayout, { parent: group, layoutConfig: doric.layoutConfig().most() },
             doric.jsx.createElement(doric.List, { layoutConfig: doric.layoutConfig().mostWidth().justHeight().configWeight(1), backgroundColor: doric.Color.WHITE, ref: this.listRef }),
             doric.jsx.createElement(doric.FlexLayout, { layoutConfig: doric.layoutConfig()
@@ -6694,7 +6691,12 @@ class StateModule extends DCModule {
     }
 }
 
-const DCM = [LogModule, ElementModule, StateModule, RegistryModule];
+const DCM = [
+    LogModule,
+    ElementModule,
+    StateModule,
+    RegistryModule,
+];
 class DCVH extends doric.ViewHolder {
     constructor() {
         super(...arguments);
@@ -6720,17 +6722,21 @@ class DCVM extends doric.ViewModel {
     }
     onAttached(state, vh) {
         vh.containerRef.current.onClick = () => {
-            doric.notification(this.context).publish({ biz: identifier, name: donConsoleNotiName, data: {
+            doric.notification(this.context).publish({
+                biz: identifier,
+                name: donConsoleNotiName,
+                data: {
                     isShowing: false,
-                    id: this.context.id
-                } });
+                    id: this.context.id,
+                },
+            });
             this.updateState((state) => (state.show = false));
         };
         state.dcModules.forEach((e) => {
-            const title = (doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().fitWidth().mostHeight(), padding: { left: 20, right: 20 }, backgroundColor: doric.Color.WHITE, onClick: () => {
+            const title = (doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().fitWidth().mostHeight(), padding: { left: 20, right: 20 }, backgroundColor: doric.Color.WHITE, textColor: doric.Color.BLACK, onClick: () => {
                     this.updateState((state) => (state.selectedModule = e));
                 } }, e.title()));
-            const content = doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig().most() });
+            const content = (doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig().most(), backgroundColor: doric.Color.parse("#ecf0f1") }));
             vh.tabRef.current.addChild(title);
             vh.contentRef.current.addChild(content);
             this.vRecord.set(e, { title, content });
@@ -6784,10 +6790,14 @@ function openDConsole(context) {
                 .configMargin({
                 bottom: 80,
             }), onClick: () => {
-                doric.notification(context).publish({ biz: identifier, name: donConsoleNotiName, data: {
+                doric.notification(context).publish({
+                    biz: identifier,
+                    name: donConsoleNotiName,
+                    data: {
                         isShowing: true,
-                        id: context.id
-                    } });
+                        id: context.id,
+                    },
+                });
                 vm.updateState((state) => (state.show = true));
             }, onTouchDown: () => {
                 btnRef.current.backgroundColor = doric.Color.parse("#16a085");
