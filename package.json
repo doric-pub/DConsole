@@ -1,6 +1,6 @@
 {
-    "name": "dconsole",
-    "version": "0.1.0",
+    "name": "doric-console",
+    "version": "0.1.1",
     "main": "dist/bundle_dconsole.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",

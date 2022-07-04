@@ -18,7 +18,7 @@
 1. 将 dConsole 添加到ts项目中，使用 npm安装：
 
 ```
-$ npm install dconsole
+$ npm install doric-console
 ```
 
 在Panel的`onCreate()`回调方法里，通过`openDConsole(context: BridgeContext)`方法传入当前的`context`即可
@@ -52,7 +52,7 @@ $ pod 'dConsole'
 ```java
 dependencies {
     ......
-    implementation "pub.doric:dconsole:0.1.0"
+    implementation "pub.doric:dconsole:0.1.1"
 }
 ```
 

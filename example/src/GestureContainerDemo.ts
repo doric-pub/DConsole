@@ -14,7 +14,7 @@ import {
   SwipeOrientation,
 } from "doric";
 const colorHex = Color.parse("#eb4d4b");
-import { openDConsole } from "dConsole";
+import { openDConsole } from "doric-console";
 
 @Entry
 export class GestureContainerDemo extends Panel {
