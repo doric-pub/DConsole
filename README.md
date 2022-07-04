@@ -35,13 +35,13 @@ onCreate() {
 
 2. iOS端使用cocoapods引入 （**非必须**）
 
-```
+```objc
 $ pod 'dConsole'
 
 ```
 注册library
 
-```
+```objc
 #import "dConsoleLibrary.h"
 
 [Doric registerLibrary:[dConsoleLibrary new]];
@@ -49,7 +49,7 @@ $ pod 'dConsole'
 
 3. Andorid端在app目录中的 build.gradle 中添加依赖（**非必须**）
 
-```
+```java
 dependencies {
     ......
     implementation "pub.doric:dconsole:0.1.0"
@@ -58,7 +58,7 @@ dependencies {
 
 注册library
 
-```
+```java
 import pub.doric.library.dConsoleLibrary;
 
 Doric.registerLibrary(new dConsoleLibrary());
@@ -68,7 +68,7 @@ Doric.registerLibrary(new dConsoleLibrary());
 
 ### Requirements
 
-```
+```js
 "dependencies": {
       "doric": "^0.10.16",
 },
