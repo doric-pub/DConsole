@@ -8,102 +8,102 @@ import json from "@rollup/plugin-json";
 import image from "@rollup/plugin-image";
 
 function searchImages(dir, images) {
-  const files = fs.readdirSync(dir);
-  files.forEach((item, index) => {
-    var fullPath = path.join(dir, item);
-    const stat = fs.statSync(fullPath);
-    if (stat.isDirectory()) {
-      searchImages(path.join(dir, item), images);
-    } else {
-      if (fullPath.endsWith(".png")) {
-        images.push(fullPath);
-      }
-    }
-  });
-  return images;
+    const files = fs.readdirSync(dir);
+    files.forEach((item, index) => {
+        var fullPath = path.join(dir, item);
+        const stat = fs.statSync(fullPath);
+        if (stat.isDirectory()) {
+            searchImages(path.join(dir, item), images);
+        } else {
+            if (fullPath.endsWith(".png")) {
+                images.push(fullPath);
+            }
+        }
+    });
+    return images;
 }
 
 const allImages = [];
 searchImages("src", allImages);
 
 function mkdirsSync(dirname) {
-  if (fs.existsSync(dirname)) {
-    return true;
-  } else {
-    if (mkdirsSync(path.dirname(dirname))) {
-      fs.mkdirSync(dirname);
-      return true;
+    if (fs.existsSync(dirname)) {
+        return true;
+    } else {
+        if (mkdirsSync(path.dirname(dirname))) {
+            fs.mkdirSync(dirname);
+            return true;
+        }
     }
-  }
 }
 
 allImages.forEach((value) => {
-  let path = __dirname + "/build/" + value;
-  let index = path.lastIndexOf("/");
-  mkdirsSync(path.substring(0, index));
+    let path = __dirname + "/build/" + value;
+    let index = path.lastIndexOf("/");
+    mkdirsSync(path.substring(0, index));
 
-  fs.copyFile(
-    __dirname + "/" + value,
-    __dirname + "/build/" + value,
-    (error) => {
-      console.log(error);
-    }
-  );
+    fs.copyFile(
+        __dirname + "/" + value,
+        __dirname + "/build/" + value,
+        (error) => {
+            console.log(error);
+        }
+    );
 });
 
 function readDirs(dirPath, files) {
-  if (fs.statSync(dirPath).isDirectory()) {
-    fs.readdirSync(dirPath).forEach((e) => {
-      readDirs(path.join(dirPath, e), files);
-    });
-  } else {
-    for (let bundle of bundles) {
-      if (dirPath.match(new RegExp(`^${bundle}`))) {
-        files.push(dirPath);
-      }
+    if (fs.statSync(dirPath).isDirectory()) {
+        fs.readdirSync(dirPath).forEach((e) => {
+            readDirs(path.join(dirPath, e), files);
+        });
+    } else {
+        for (let bundle of bundles) {
+            if (dirPath.match(new RegExp(`^${bundle}`))) {
+                files.push(dirPath);
+            }
+        }
     }
-  }
 }
 
 const dirs = fs.readdirSync(".").filter((e) => {
-  for (let bundle of bundles) {
-    if (bundle.match(new RegExp(`^${e}/`))) {
-      return true;
+    for (let bundle of bundles) {
+        if (bundle.match(new RegExp(`^${e}/`))) {
+            return true;
+        }
     }
-  }
-  return false;
+    return false;
 });
 
 const allFiles = [];
 
 dirs.forEach((e) => {
-  readDirs(e, allFiles);
+    readDirs(e, allFiles);
 });
 export default allFiles
-  .map((e) => e.replace(/\.tsx?$/, ""))
-  .map((bundle) => {
-    return {
-      input: `build/${bundle}.js`,
-      output: {
-        format: "cjs",
-        file: `bundle/${bundle}.js`,
-        sourcemap: true,
-      },
-      plugins: [
-        resolve({ mainFields: ["jsnext"] }),
-        commonjs(),
-        json(),
-        image(),
-      ],
-      external: ["reflect-metadata", "doric", "templatelibrary"],
-      onwarn: function (warning) {
-        if (warning.code === "THIS_IS_UNDEFINED") {
-          return;
-        }
-        console.warn(warning.message);
-      },
-    };
-  });
+    .map((e) => e.replace(/\.tsx?$/, ""))
+    .map((bundle) => {
+        return {
+            input: `build/${bundle}.js`,
+            output: {
+                format: "cjs",
+                file: `bundle/${bundle}.js`,
+                sourcemap: true,
+            },
+            plugins: [
+                resolve({ mainFields: ["jsnext"] }),
+                commonjs(),
+                json(),
+                image(),
+            ],
+            external: ["reflect-metadata", "doric", "dconsole"],
+            onwarn: function(warning) {
+                if (warning.code === "THIS_IS_UNDEFINED") {
+                    return;
+                }
+                console.warn(warning.message);
+            },
+        };
+    });
 // If need ES5 support enable following configs
 // .concat(
 //     allFiles

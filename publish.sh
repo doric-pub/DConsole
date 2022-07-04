@@ -11,7 +11,7 @@ CURRENT_VERSION=$(cat $CURRENT_DIR/version)
 echo "Current version is "$CURRENT_VERSION
 
 ## iOS
-sed -i "" "s/\(version[ ]*= \)'[0-9 \.]*'/\1'$CURRENT_VERSION'/g" $CURRENT_DIR/DoricSVG.podspec
+sed -i "" "s/\(version[ ]*= \)'[0-9 \.]*'/\1'$CURRENT_VERSION'/g" $CURRENT_DIR/dConsole.podspec
 
 # git save
 cd $CURRENT_DIR/
@@ -41,4 +41,4 @@ cd $CURRENT_DIR/ && npm publish
 echo "Publish Android"
 cd $CURRENT_DIR/example/android && ./gradlew clean :lib:uploadArchives 
 echo "Publish iOS"
-cd $CURRENT_DIR && pod trunk push DoricSVG.podspec --allow-warnings
+cd $CURRENT_DIR && pod trunk push dConsole.podspec --allow-warnings

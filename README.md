@@ -31,13 +31,23 @@ onCreate() {
 }
 ```
 
-2. iOS端使用cocoapods引入
+完成以上ts项目中的配置即可使用DConsole，如果需要在调试面板查看`libraries`、`plugins`、`nodes`， 则需要在iOS或者Andorid端进行以下配置。
+
+2. iOS端使用cocoapods引入 （**非必须**）
 
 ```
 $ pod 'dConsole'
+
+```
+注册library
+
+```
+#import "dConsoleLibrary.h"
+
+[Doric registerLibrary:[dConsoleLibrary new]];
 ```
 
-3. Andorid端在app目录中的 build.gradle 中添加依赖:
+3. Andorid端在app目录中的 build.gradle 中添加依赖（**非必须**）
 
 ```
 dependencies {
@@ -45,6 +55,16 @@ dependencies {
     implementation "pub.doric:dconsole:0.1.0"
 }
 ```
+
+注册library
+
+```
+import pub.doric.library.dConsoleLibrary;
+
+Doric.registerLibrary(new dConsoleLibrary());
+
+```
+
 
 ### Requirements
 
