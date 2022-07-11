@@ -52,7 +52,7 @@ $ pod 'dConsole'
 ```java
 dependencies {
     ......
-    implementation "pub.doric:dconsole:0.1.1"
+    implementation "pub.doric:dconsole:0.1.2"
 }
 ```
 
