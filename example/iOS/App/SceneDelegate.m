@@ -1,6 +1,7 @@
 #import "SceneDelegate.h"
 #import <DoricCore/Doric.h>
 #import "dConsoleLibrary.h"
+#import "DemoLibrary.h"
 
 #if DEBUG
 
@@ -13,7 +14,13 @@
 
 @implementation SceneDelegate
 - (void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session options:(UISceneConnectionOptions *)connectionOptions {
+    
+    /// 注册 dConsoleLibrary
     [Doric registerLibrary:[dConsoleLibrary new]];
+    
+    /// 注册 DemoLibrary  , only for test !
+    [Doric registerLibrary:[DemoLibrary new]];
+    
     UIWindowScene *windowScene = (UIWindowScene *) scene;
     NSString *bundleName = @"Example";
     DoricViewController *doricViewController = [[DoricViewController alloc] initWithSource:[NSString stringWithFormat:@"assets://src/%@.js", bundleName]

@@ -13,9 +13,11 @@ import {
   loge,
   logw,
   navigator,
+  hlayout,
 } from "doric";
 import { openDConsole } from "doric-console";
 import { CounterDemo } from "./CounterDemo";
+import { demoPlugin } from "./DemoPlugin";
 import { GestureContainerDemo } from "./GestureContainerDemo";
 
 @Entry
@@ -61,7 +63,7 @@ class Example extends Panel {
         backgroundColor: Color.parse("#70a1ff"),
         textColor: Color.WHITE,
         onClick: async () => {
-          log("mvvm state");
+          log("mvvm state11");
           logw("mvvm state");
           loge("mvvm state");
           navigator(this.context).push(CounterDemo)
@@ -69,9 +71,57 @@ class Example extends Panel {
         layoutConfig: layoutConfig().fit(),
         padding: { left: 20, right: 20, top: 20, bottom: 20 },
       }),
+
+      hlayout([
+
+        text({
+          text: "打开",
+          textSize: 18,
+          backgroundColor: Color.parse("#70a1ff"),
+          textColor: Color.WHITE,
+          onClick: async () => {
+            log("mvvm state11");
+            demoPlugin(this.context).openDConsole();
+          }, 
+          height: 30,
+          layoutConfig: layoutConfig().fitWidth().justHeight(),
+          padding: { left: 15, right: 15},
+          corners: 15
+        }),
+
+        text({
+          text: "已打开",
+          textSize: 18,
+          fontStyle: "bold_italic",
+          layoutConfig: layoutConfig().fit(),
+          padding: { left: 10, right: 10},
+        }),
+
+        text({
+          text: "关闭",
+          textSize: 18,
+          backgroundColor: Color.parse("#70a1ff"),
+          textColor: Color.WHITE,
+          onClick: async () => {
+            log("mvvm state11");
+            demoPlugin(this.context).closeDConsole();
+          },
+          height: 30,
+          layoutConfig: layoutConfig().fitWidth().justHeight(),
+          padding: { left: 15, right: 15},
+          corners: 15
+        }),
+
+      ],{
+        backgroundColor: Color.WHITE,
+        space: 5,
+        height: 60,
+        gravity: Gravity.CenterY,
+        layoutConfig: layoutConfig().fitWidth().justHeight().configMargin({top: 10})
+      })
     ])
       .apply({
-        layoutConfig: layoutConfig().fit().configAlignment(Gravity.CenterX),
+        layoutConfig: layoutConfig().fitHeight().mostWidth().configAlignment(Gravity.CenterX),
         space: 20,
         gravity: Gravity.Center,
       })

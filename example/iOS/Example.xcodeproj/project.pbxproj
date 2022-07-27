@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		89ECE884CE4B563A091D6AD3 /* libPods-Example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 435113A53785539DAF219B19 /* libPods-Example.a */; };
+		A444839E288FE82400B6EAED /* DemoLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = A444839D288FE82400B6EAED /* DemoLibrary.m */; };
+		A44483A1288FE90B00B6EAED /* DemoPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = A44483A0288FE90B00B6EAED /* DemoPlugin.m */; };
 		E2B059BF23C452BB007555C7 /* src in Resources */ = {isa = PBXBuildFile; fileRef = E2B059BE23C452BB007555C7 /* src */; };
 		E2EF0C19275F78A8007801C5 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = E2EF0C18275F78A8007801C5 /* assets */; };
 		E2F64CEF2399359C0006BD9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E2F64CEE2399359C0006BD9A /* AppDelegate.m */; };
@@ -23,6 +25,10 @@
 		5D47A9D4EA2836D57373FDF6 /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.release.xcconfig"; path = "Target Support Files/Pods-Example/Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
 		8B65D8E3CB45345BA0554208 /* Pods-TemplateLibrary.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TemplateLibrary.release.xcconfig"; path = "Target Support Files/Pods-TemplateLibrary/Pods-TemplateLibrary.release.xcconfig"; sourceTree = "<group>"; };
 		8CBFE74FB341E5BB3349F209 /* Pods-TemplateLibrary.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TemplateLibrary.debug.xcconfig"; path = "Target Support Files/Pods-TemplateLibrary/Pods-TemplateLibrary.debug.xcconfig"; sourceTree = "<group>"; };
+		A444839C288FE82400B6EAED /* DemoLibrary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DemoLibrary.h; sourceTree = "<group>"; };
+		A444839D288FE82400B6EAED /* DemoLibrary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DemoLibrary.m; sourceTree = "<group>"; };
+		A444839F288FE90B00B6EAED /* DemoPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DemoPlugin.h; sourceTree = "<group>"; };
+		A44483A0288FE90B00B6EAED /* DemoPlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DemoPlugin.m; sourceTree = "<group>"; };
 		E2B059BE23C452BB007555C7 /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; name = src; path = ../bundle/src; sourceTree = "<group>"; };
 		E2EF0C18275F78A8007801C5 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../assets; sourceTree = "<group>"; };
 		E2F64CEA2399359C0006BD9A /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -86,6 +92,10 @@
 				E2F64CEE2399359C0006BD9A /* AppDelegate.m */,
 				E2F64CF02399359C0006BD9A /* SceneDelegate.h */,
 				E2F64CF12399359C0006BD9A /* SceneDelegate.m */,
+				A444839C288FE82400B6EAED /* DemoLibrary.h */,
+				A444839D288FE82400B6EAED /* DemoLibrary.m */,
+				A444839F288FE90B00B6EAED /* DemoPlugin.h */,
+				A44483A0288FE90B00B6EAED /* DemoPlugin.m */,
 				E2F64CF92399359E0006BD9A /* Assets.xcassets */,
 				E2F64CFB2399359E0006BD9A /* LaunchScreen.storyboard */,
 				E2F64CFE2399359E0006BD9A /* Info.plist */,
@@ -238,6 +248,8 @@
 			files = (
 				E2F64CEF2399359C0006BD9A /* AppDelegate.m in Sources */,
 				E2F64D002399359E0006BD9A /* main.m in Sources */,
+				A44483A1288FE90B00B6EAED /* DemoPlugin.m in Sources */,
+				A444839E288FE82400B6EAED /* DemoLibrary.m in Sources */,
 				E2F64CF22399359C0006BD9A /* SceneDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

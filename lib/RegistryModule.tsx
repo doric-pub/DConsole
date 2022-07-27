@@ -12,6 +12,7 @@ import {
   layoutConfig,
   List,
   ListItem,
+  loge,
   SlideItem,
   Slider,
   Stack,
@@ -67,19 +68,19 @@ export class RegistryModule extends DCModule<number> {
   }
 
   async readData() {
+    this.datas.length = 0;
     this.libraries = await dconsolePlugin(this.context).libraries();
     this.plugins = await dconsolePlugin(this.context).nativePlugins();
     this.nodes = await dconsolePlugin(this.context).viewNodes();
-    this.datas.length = 0;
     this.datas = this.datas.concat([this.libraries, this.plugins, this.nodes]);
     this.onBind(this._state);
-    setTimeout(() => {
-      this.sliderRef.current.slidePage(
-        this.context,
-        this.currentSelectIndex,
-        true
-      );
-    }, 500);
+    // setTimeout(() => {
+    //   this.sliderRef.current.slidePage(
+    //     this.context,
+    //     this.currentSelectIndex,
+    //     true
+    //   );
+    // }, 500);
   }
 
   bottomButtons() {
@@ -196,29 +197,35 @@ export class RegistryModule extends DCModule<number> {
             : Color.LTGRAY,
       });
     });
+    
     this.btnTexts.forEach((t, index) => {
-      var str = "";
-      const count = ` : ${this.datas[index].length}`;
-      if (index === 0) {
-        str = "libraries" + count;
-      } else if (index === 1) {
-        str = "plugins" + count;
-      } else if (index === 2) {
-        str = "nodes" + count;
+      if (index < this.datas.length) {
+        var str = "";
+        let array = this.datas[index];
+        if (array === undefined) return;
+        const count = ` : ${array.length}`;
+        if (index === 0) {
+          str = "libraries" + count;
+        } else if (index === 1) {
+          str = "plugins" + count;
+        } else if (index === 2) {
+          str = "nodes" + count;
+        }
+        t.apply({
+          text: str,
+        });
       }
-      t.apply({
-        text: str,
-      });
     });
   }
 
   scrollToIndex(index: number) {
-    if (index != this.currentSelectIndex) {
+    if (index != this.currentSelectIndex && index < this.sliderRef.current.itemCount) {
       this.sliderRef.current.slidePage(this.context, index, true);
     }
   }
 
   onBind(state: number): void {
+    loge(`1234565  onBind`)
     this.sliderRef.apply({
       itemCount: this.datas.length,
     });
