@@ -74,13 +74,6 @@ export class RegistryModule extends DCModule<number> {
     this.nodes = await dconsolePlugin(this.context).viewNodes();
     this.datas = this.datas.concat([this.libraries, this.plugins, this.nodes]);
     this.onBind(this._state);
-    // setTimeout(() => {
-    //   this.sliderRef.current.slidePage(
-    //     this.context,
-    //     this.currentSelectIndex,
-    //     true
-    //   );
-    // }, 500);
   }
 
   bottomButtons() {

@@ -179,7 +179,7 @@ export async function openDConsole(context: BridgeContext) {
     <GestureContainer
       ref={btnRef}
       tag={identifier}
-      hidden={true}
+      hidden={false}
       parent={panel.getRootView()}
       backgroundColor={Color.parse("#2ecc71")}
       layoutConfig={layoutConfig()

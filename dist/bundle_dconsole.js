@@ -468,13 +468,6 @@ class RegistryModule extends DCModule {
             this.nodes = yield dconsolePlugin(this.context).viewNodes();
             this.datas = this.datas.concat([this.libraries, this.plugins, this.nodes]);
             this.onBind(this._state);
-            // setTimeout(() => {
-            //   this.sliderRef.current.slidePage(
-            //     this.context,
-            //     this.currentSelectIndex,
-            //     true
-            //   );
-            // }, 500);
         });
     }
     bottomButtons() {
@@ -6806,7 +6799,7 @@ function openDConsole(context) {
         vm.context = context;
         panel["__build__"] = (frame) => {
             Reflect.apply(originBuild, panel, [frame]);
-            doric.jsx.createElement(doric.GestureContainer, { ref: btnRef, tag: identifier, hidden: true, parent: panel.getRootView(), backgroundColor: doric.Color.parse("#2ecc71"), layoutConfig: doric.layoutConfig()
+            doric.jsx.createElement(doric.GestureContainer, { ref: btnRef, tag: identifier, hidden: false, parent: panel.getRootView(), backgroundColor: doric.Color.parse("#2ecc71"), layoutConfig: doric.layoutConfig()
                     .fit()
                     .configAlignment(doric.Gravity.Right.bottom())
                     .configMargin({
