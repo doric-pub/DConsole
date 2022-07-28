@@ -40,7 +40,6 @@ class Example extends Panel {
   }
 
   build(rootView: Group) {
-    log(`build============build12333=======build`);
     vlayout([
       image({
         image: new AssetsResource("logo_doric.png"),
@@ -83,7 +82,6 @@ class Example extends Panel {
         layoutConfig: layoutConfig().fit(),
         padding: { left: 20, right: 20, top: 20, bottom: 20 },
       }),
-
       hlayout(
         [
           text({
@@ -103,9 +101,10 @@ class Example extends Panel {
           (this.stateText = text({
             text: "已关闭",
             textSize: 18,
-            fontStyle: "bold_italic",
-            layoutConfig: layoutConfig().fit(),
-            padding: { left: 10, right: 10 },
+            fontStyle: "bold",
+            height: 30,
+            layoutConfig: layoutConfig().fitWidth().justHeight(),
+            padding: { left: 15, right: 15 }
           })),
 
           text({
@@ -123,7 +122,6 @@ class Example extends Panel {
           }),
         ],
         {
-          backgroundColor: Color.WHITE,
           space: 5,
           height: 60,
           gravity: Gravity.CenterY,

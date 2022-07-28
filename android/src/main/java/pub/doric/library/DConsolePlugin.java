@@ -82,4 +82,9 @@ public class DConsolePlugin extends DoricJavaPlugin {
         JSONArray jsonArray = new JSONArray(nodesList);
         promise.resolve(new JavaValue(jsonArray));
     }
+
+    @DoricMethod
+    public void enableState(DoricPromise promise) {
+        promise.resolve(new JavaValue(DConsoleManager.getInstance().enable));
+    }
 }

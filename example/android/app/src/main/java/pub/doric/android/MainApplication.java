@@ -11,5 +11,6 @@ public class MainApplication extends Application {
         super.onCreate();
         Doric.init(this);
         Doric.registerLibrary(new dConsoleLibrary());
+        Doric.registerLibrary(new DemoLibrary());
     }
 }
