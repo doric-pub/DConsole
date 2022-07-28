@@ -15,11 +15,14 @@ function dconsolePlugin(context) {
         viewNodes: () => {
             return context.callNative("dconsolePlugin", "viewNodes");
         },
+        enableState: () => {
+            return context.callNative("dconsolePlugin", "enableState");
+        }
     };
 }
 
 const identifier = "dConsole";
-const donConsoleNotiName = "donConsoleNotiName";
+const donConsoleNotiName = "dConsoleNotiName";
 const purpRedColor = doric.Color.parse("#D608D6");
 const greenThemeColor = doric.Color.parse("#2ecc71");
 [
@@ -48,7 +51,7 @@ class DCModule {
     onHide() { }
 }
 
-var __awaiter$2 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$3 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -117,7 +120,6 @@ class ElementModule extends DCModule {
     onAttached(state) {
         doric.notification(this.context)
             .subscribe({
-            biz: identifier,
             name: donConsoleNotiName,
             callback: (data) => {
                 const id = data.id;
@@ -256,7 +258,7 @@ class ElementModule extends DCModule {
                 this.displayElementDetail(element);
             } },
             doric.jsx.createElement(doric.HLayout, { layoutConfig: doric.layoutConfig().mostWidth().fitHeight(), gravity: doric.Gravity.CenterY.left() },
-                doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig().just(), width: 24, height: 26, left: leftPadding, onClick: () => __awaiter$2(this, void 0, void 0, function* () {
+                doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig().just(), width: 24, height: 26, left: leftPadding, onClick: () => __awaiter$3(this, void 0, void 0, function* () {
                         if (!this.isAnimating && arrowImage.hidden === false) {
                             this.isAnimating = true;
                             const duration = 120;
@@ -312,7 +314,7 @@ class ElementModule extends DCModule {
     }
 }
 
-var __awaiter$1 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$2 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -338,7 +340,7 @@ class LogModule extends DCModule {
             doric.jsx.createElement(doric.List, { ref: this.listRef, layoutConfig: doric.layoutConfig().mostWidth().justHeight().configWeight(1) }),
             doric.jsx.createElement(doric.HLayout, { layoutConfig: doric.layoutConfig().mostWidth().justHeight(), height: 50, gravity: doric.Gravity.CenterY, padding: { left: 15, right: 15 } },
                 doric.jsx.createElement(doric.Input, { ref: this.inputRef, layoutConfig: doric.layoutConfig().mostHeight().justWidth().configWeight(2), backgroundColor: doric.Color.parse("#ecf0f1"), textAlignment: doric.Gravity.CenterY.left() }),
-                doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().mostHeight().fitWidth(), padding: { left: 15, right: 15 }, backgroundColor: doric.Color.parse("#bdc3c7"), onClick: () => __awaiter$1(this, void 0, void 0, function* () {
+                doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().mostHeight().fitWidth(), padding: { left: 15, right: 15 }, backgroundColor: doric.Color.parse("#bdc3c7"), onClick: () => __awaiter$2(this, void 0, void 0, function* () {
                         const text = yield this.inputRef.current.getText(this.context);
                         if ((text === null || text === void 0 ? void 0 : text.length) <= 0) {
                             return;
@@ -417,7 +419,7 @@ class LogModule extends DCModule {
     }
 }
 
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var __awaiter$1 = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -459,7 +461,7 @@ class RegistryModule extends DCModule {
                 } }, this.bottomButtons()));
     }
     readData() {
-        return __awaiter(this, void 0, void 0, function* () {
+        return __awaiter$1(this, void 0, void 0, function* () {
             this.datas.length = 0;
             this.libraries = yield dconsolePlugin(this.context).libraries();
             this.plugins = yield dconsolePlugin(this.context).nativePlugins();
@@ -6701,6 +6703,16 @@ class StateModule extends DCModule {
     }
 }
 
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+const dConsoleEnableStateNotiName = "dConsoleEnableStateNotiName";
 const DCM = [
     LogModule,
     ElementModule,
@@ -6733,7 +6745,6 @@ class DCVM extends doric.ViewModel {
     onAttached(state, vh) {
         vh.containerRef.current.onClick = () => {
             doric.notification(this.context).publish({
-                biz: identifier,
                 name: donConsoleNotiName,
                 data: {
                     isShowing: false,
@@ -6782,100 +6793,120 @@ class DCVM extends doric.ViewModel {
     }
 }
 function openDConsole(context) {
-    const panel = context.entity;
-    const originBuild = panel["__build__"];
-    const btnRef = doric.createRef();
-    const dcModules = DCM.map((e) => new e(context));
-    const vm = new DCVM({
-        show: false,
-        dcModules,
-        selectedModule: dcModules[0],
-    }, new DCVH());
-    vm.context = context;
-    panel["__build__"] = (frame) => {
-        Reflect.apply(originBuild, panel, [frame]);
-        doric.jsx.createElement(doric.GestureContainer, { ref: btnRef, tag: identifier, parent: panel.getRootView(), backgroundColor: doric.Color.parse("#2ecc71"), layoutConfig: doric.layoutConfig()
-                .fit()
-                .configAlignment(doric.Gravity.Right.bottom())
-                .configMargin({
-                bottom: 80,
-            }), onClick: () => {
-                doric.notification(context).publish({
-                    biz: identifier,
-                    name: donConsoleNotiName,
-                    data: {
-                        isShowing: true,
-                        id: context.id,
-                    },
-                });
-                vm.updateState((state) => (state.show = true));
-            }, onTouchDown: () => {
-                btnRef.current.backgroundColor = doric.Color.parse("#16a085");
-            }, onTouchCancel: () => {
-                btnRef.current.backgroundColor = doric.Color.parse("#2ecc71");
-            }, onTouchUp: () => {
-                btnRef.current.backgroundColor = doric.Color.parse("#2ecc71");
-            }, onSwipe: (orientation) => {
-                var _a, _b;
-                const margin = {
+    return __awaiter(this, void 0, void 0, function* () {
+        const panel = context.entity;
+        const originBuild = panel["__build__"];
+        const btnRef = doric.createRef();
+        const dcModules = DCM.map((e) => new e(context));
+        const vm = new DCVM({
+            show: false,
+            dcModules,
+            selectedModule: dcModules[0],
+        }, new DCVH());
+        vm.context = context;
+        panel["__build__"] = (frame) => {
+            Reflect.apply(originBuild, panel, [frame]);
+            doric.jsx.createElement(doric.GestureContainer, { ref: btnRef, tag: identifier, hidden: true, parent: panel.getRootView(), backgroundColor: doric.Color.parse("#2ecc71"), layoutConfig: doric.layoutConfig()
+                    .fit()
+                    .configAlignment(doric.Gravity.Right.bottom())
+                    .configMargin({
                     bottom: 80,
-                };
-                const gravity = (_b = (_a = btnRef.current.layoutConfig) === null || _a === void 0 ? void 0 : _a.alignment) !== null && _b !== void 0 ? _b : doric.Gravity.Left;
-                if (orientation === doric.SwipeOrientation.RIGHT) {
-                    gravity.val = gravity.val ^ doric.LEFT;
-                    btnRef.current.layoutConfig = doric.layoutConfig()
-                        .fit()
-                        .configAlignment(gravity.right())
-                        .configMargin(margin);
+                }), onClick: () => {
+                    doric.notification(context).publish({
+                        name: donConsoleNotiName,
+                        data: {
+                            isShowing: true,
+                            id: context.id,
+                        },
+                    });
+                    vm.updateState((state) => (state.show = true));
+                }, onTouchDown: () => {
+                    btnRef.current.backgroundColor = doric.Color.parse("#16a085");
+                }, onTouchCancel: () => {
+                    btnRef.current.backgroundColor = doric.Color.parse("#2ecc71");
+                }, onTouchUp: () => {
+                    btnRef.current.backgroundColor = doric.Color.parse("#2ecc71");
+                }, onSwipe: (orientation) => {
+                    var _a, _b;
+                    const margin = {
+                        bottom: 80,
+                    };
+                    const gravity = (_b = (_a = btnRef.current.layoutConfig) === null || _a === void 0 ? void 0 : _a.alignment) !== null && _b !== void 0 ? _b : doric.Gravity.Left;
+                    if (orientation === doric.SwipeOrientation.RIGHT) {
+                        gravity.val = gravity.val ^ doric.LEFT;
+                        btnRef.current.layoutConfig = doric.layoutConfig()
+                            .fit()
+                            .configAlignment(gravity.right())
+                            .configMargin(margin);
+                    }
+                    else if (orientation === doric.SwipeOrientation.LEFT) {
+                        gravity.val = gravity.val ^ doric.RIGHT;
+                        btnRef.current.layoutConfig = doric.layoutConfig()
+                            .fit()
+                            .configAlignment(gravity.left())
+                            .configMargin(margin);
+                    }
+                    if (orientation === doric.SwipeOrientation.BOTTOM) {
+                        gravity.val = gravity.val ^ doric.TOP;
+                        btnRef.current.layoutConfig = doric.layoutConfig()
+                            .fit()
+                            .configAlignment(gravity.bottom())
+                            .configMargin(margin);
+                    }
+                    else if (orientation === doric.SwipeOrientation.TOP) {
+                        gravity.val = gravity.val ^ doric.BOTTOM;
+                        btnRef.current.layoutConfig = doric.layoutConfig()
+                            .fit()
+                            .configAlignment(gravity.top())
+                            .configMargin(margin);
+                    }
+                } },
+                doric.jsx.createElement(doric.Text, { padding: { left: 15, right: 15, top: 10, bottom: 10 }, textColor: doric.Color.WHITE, fontStyle: "bold" }, "dConsole"));
+            vm.attach(panel.getRootView());
+            const destroyCallbacks = [];
+            const global = new Function("return this")();
+            const originJSReleaseContext = global.doric.jsReleaseContext;
+            global.doric.jsReleaseContext = (id) => {
+                if (id === context.id) {
+                    vm.getState().dcModules.forEach((module) => { var _a; return (_a = module.onDestroy) === null || _a === void 0 ? void 0 : _a.call(module); });
+                    destroyCallbacks.forEach((e) => e());
                 }
-                else if (orientation === doric.SwipeOrientation.LEFT) {
-                    gravity.val = gravity.val ^ doric.RIGHT;
-                    btnRef.current.layoutConfig = doric.layoutConfig()
-                        .fit()
-                        .configAlignment(gravity.left())
-                        .configMargin(margin);
+                Reflect.apply(originJSReleaseContext, global.doric, [id]);
+            };
+            doric.keyboard(context)
+                .subscribe((data) => {
+                if (Environment.platform === "iOS") {
+                    vm.getViewHolder().containerRef.current.translationY = -(data.bottomMargin + data.height);
                 }
-                if (orientation === doric.SwipeOrientation.BOTTOM) {
-                    gravity.val = gravity.val ^ doric.TOP;
-                    btnRef.current.layoutConfig = doric.layoutConfig()
-                        .fit()
-                        .configAlignment(gravity.bottom())
-                        .configMargin(margin);
-                }
-                else if (orientation === doric.SwipeOrientation.TOP) {
-                    gravity.val = gravity.val ^ doric.BOTTOM;
-                    btnRef.current.layoutConfig = doric.layoutConfig()
-                        .fit()
-                        .configAlignment(gravity.top())
-                        .configMargin(margin);
-                }
-            } },
-            doric.jsx.createElement(doric.Text, { padding: { left: 15, right: 15, top: 10, bottom: 10 }, textColor: doric.Color.WHITE, fontStyle: "bold" }, "dConsole"));
-        vm.attach(panel.getRootView());
-        const destroyCallbacks = [];
-        const global = new Function("return this")();
-        const originJSReleaseContext = global.doric.jsReleaseContext;
-        global.doric.jsReleaseContext = (id) => {
-            if (id === context.id) {
-                vm.getState().dcModules.forEach((module) => { var _a; return (_a = module.onDestroy) === null || _a === void 0 ? void 0 : _a.call(module); });
-                destroyCallbacks.forEach((e) => e());
-            }
-            Reflect.apply(originJSReleaseContext, global.doric, [id]);
-        };
-        doric.keyboard(context)
-            .subscribe((data) => {
-            if (Environment.platform === "iOS") {
-                vm.getViewHolder().containerRef.current.translationY = -(data.bottomMargin + data.height);
-            }
-        })
-            .then((subId) => {
-            destroyCallbacks.push(() => {
-                doric.keyboard(context).unsubscribe(subId);
+            })
+                .then((subId) => {
+                destroyCallbacks.push(() => {
+                    doric.keyboard(context).unsubscribe(subId);
+                });
             });
-        });
-    };
+            doric.notification(context)
+                .subscribe({
+                name: dConsoleEnableStateNotiName,
+                callback: (data) => {
+                    const isEnable = data.isEnable;
+                    if (btnRef.current !== undefined) {
+                        btnRef.current.hidden = !!!isEnable;
+                    }
+                },
+            })
+                .then((subscribeId) => {
+                destroyCallbacks.push(() => {
+                    doric.notification(context).unsubscribe(subscribeId);
+                });
+            });
+            dconsolePlugin(context).enableState().then((isEnable) => {
+                btnRef.current.hidden = !!!isEnable;
+            });
+        };
+    });
 }
 
+exports.dConsoleEnableStateNotiName = dConsoleEnableStateNotiName;
 exports.dconsolePlugin = dconsolePlugin;
 exports.openDConsole = openDConsole;
 //# sourceMappingURL=bundle_dconsole.js.map

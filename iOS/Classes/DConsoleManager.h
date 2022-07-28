@@ -15,5 +15,7 @@
 
 - (void)enableConsole:(BOOL)enable;
 
+@property (nonatomic, copy) void(^enableStateDidChange)(BOOL enable);
+
 @end
 

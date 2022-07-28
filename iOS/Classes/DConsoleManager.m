@@ -7,6 +7,8 @@
 
 #import "DConsoleManager.h"
 
+NSNotificationName const DConsoleEnableStateNotiName = @"dConsoleEnableStateNotiName";
+
 @interface DConsoleManager()
 
 @property (nonatomic, readwrite, getter=isEnable) BOOL enable;
@@ -25,7 +27,15 @@
 }
 
 - (void)enableConsole:(BOOL)enable {
-    _enable = enable;
+    if (_enable != enable) {
+        _enable = enable;
+        [[NSNotificationCenter defaultCenter] postNotificationName:DConsoleEnableStateNotiName object:nil userInfo:@{@"isEnable": @(enable)}];
+        if (self.enableStateDidChange) {
+            self.enableStateDidChange(enable);
+        }
+    }
 }
+
+
     
 @end

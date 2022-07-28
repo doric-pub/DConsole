@@ -156,7 +156,6 @@ export class ElementModule extends DCModule<Elements> {
   onAttached(state: Elements) {
     notification(this.context)
       .subscribe({
-        biz: identifier,
         name: donConsoleNotiName,
         callback: (data) => {
           const id = data.id;

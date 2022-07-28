@@ -17,5 +17,8 @@ export function dconsolePlugin(context: BridgeContext) {
         string[]
       >;
     },
+    enableState: () => {
+      return context.callNative("dconsolePlugin", "enableState") as Promise<boolean>;
+    }
   };
 }

@@ -22,14 +22,17 @@ import {
   ClassType,
   View,
   keyboard,
-  notification,
+  notification
 } from "doric";
 import { DCModule } from "./dcModule";
+import { dconsolePlugin } from "./DConsolePlugin";
 import { ElementModule } from "./ElementModule";
 import { LogModule } from "./LogModule";
 import { RegistryModule } from "./RegistryModule";
 import { StateModule } from "./StateModule";
-import { donConsoleNotiName, identifier } from "./utils";
+import {donConsoleNotiName, identifier } from "./utils";
+
+export const dConsoleEnableStateNotiName = "dConsoleEnableStateNotiName";
 
 const DCM: ClassType<DCModule<any>>[] = [
   LogModule,
@@ -97,7 +100,6 @@ class DCVM extends ViewModel<DCModel, DCVH> {
   onAttached(state: DCModel, vh: DCVH) {
     vh.containerRef.current.onClick = () => {
       notification(this.context).publish({
-        biz: identifier,
         name: donConsoleNotiName,
         data: {
           isShowing: false,
@@ -158,7 +160,7 @@ class DCVM extends ViewModel<DCModel, DCVH> {
   }
 }
 
-export function openDConsole(context: BridgeContext) {
+export async function openDConsole(context: BridgeContext) {
   const panel = context.entity as Panel;
   const originBuild = (panel as any)["__build__"];
   const btnRef = createRef<GestureContainer>();
@@ -174,10 +176,10 @@ export function openDConsole(context: BridgeContext) {
   vm.context = context;
   (panel as any)["__build__"] = (frame: any) => {
     Reflect.apply(originBuild, panel, [frame]);
-
     <GestureContainer
       ref={btnRef}
       tag={identifier}
+      hidden={true}
       parent={panel.getRootView()}
       backgroundColor={Color.parse("#2ecc71")}
       layoutConfig={layoutConfig()
@@ -188,7 +190,6 @@ export function openDConsole(context: BridgeContext) {
         })}
       onClick={() => {
         notification(context).publish({
-          biz: identifier,
           name: donConsoleNotiName,
           data: {
             isShowing: true,
@@ -273,6 +274,26 @@ export function openDConsole(context: BridgeContext) {
         destroyCallbacks.push(() => {
           keyboard(context).unsubscribe(subId);
         });
+      });
+
+      notification(context)
+      .subscribe({
+        name: dConsoleEnableStateNotiName,
+        callback: (data) => {
+          const isEnable = data.isEnable;
+          if (btnRef.current !== undefined) {
+             btnRef.current.hidden = !!!isEnable;
+          }
+        },
+      })
+      .then((subscribeId) => {
+        destroyCallbacks.push(() => {
+          notification(context).unsubscribe(subscribeId);
+        });
+      });
+
+      dconsolePlugin(context).enableState().then((isEnable)=>{
+        btnRef.current.hidden = !!!isEnable;
       });
   };
 }

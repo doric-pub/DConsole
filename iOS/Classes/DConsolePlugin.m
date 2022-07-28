@@ -7,6 +7,7 @@
 
 #import "DConsolePlugin.h"
 #import <DoricCore/DoricSingleton.h>
+#import "DConsoleManager.h"
 
 @implementation DConsolePlugin
 
@@ -49,4 +50,9 @@
     }
     [promise resolve:[nodes copy]];
 }
+
+- (void)enableState:(NSDictionary *)dic withPromise:(DoricPromise *)promise {
+    [promise resolve:@([DConsoleManager instance].isEnable)];
+}
+
 @end
