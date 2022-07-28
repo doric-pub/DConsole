@@ -22,7 +22,7 @@ import {
   ClassType,
   View,
   keyboard,
-  notification
+  notification,
 } from "doric";
 import { DCModule } from "./dcModule";
 import { dconsolePlugin } from "./DConsolePlugin";
@@ -30,7 +30,7 @@ import { ElementModule } from "./ElementModule";
 import { LogModule } from "./LogModule";
 import { RegistryModule } from "./RegistryModule";
 import { StateModule } from "./StateModule";
-import {donConsoleNotiName, identifier } from "./utils";
+import { donConsoleNotiName, identifier } from "./utils";
 
 export const dConsoleEnableStateNotiName = "dConsoleEnableStateNotiName";
 
@@ -276,13 +276,13 @@ export async function openDConsole(context: BridgeContext) {
         });
       });
 
-      notification(context)
+    notification(context)
       .subscribe({
         name: dConsoleEnableStateNotiName,
         callback: (data) => {
           const isEnable = data.isEnable;
           if (btnRef.current !== undefined) {
-             btnRef.current.hidden = !!!isEnable;
+            btnRef.current.hidden = !isEnable;
           }
         },
       })
@@ -292,8 +292,12 @@ export async function openDConsole(context: BridgeContext) {
         });
       });
 
-      dconsolePlugin(context).enableState().then((isEnable)=>{
-        btnRef.current.hidden = !!!isEnable;
+    dconsolePlugin(context)
+      .enableState()
+      .then((isEnable) => {
+        if (btnRef.current !== undefined) {
+          btnRef.current.hidden = !isEnable;
+        }
       });
   };
 }

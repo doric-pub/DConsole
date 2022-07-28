@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = 'dConsole'
-    s.version          = '0.1.4'
+    s.version          = '0.1.5'
     s.summary          = '一个轻量、针对跨平台框架Doric开发者的调试面板。'
   
     s.homepage         = 'https://github.com/doric-pub/DConsole'

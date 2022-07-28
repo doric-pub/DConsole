@@ -1,14 +1,11 @@
 package pub.doric.library;
-
 import android.content.Intent;
-
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import pub.doric.Doric;
 
 public class DConsoleManager {
 
-    public Boolean enable = false;
+    public boolean enable = true;
 
     private static class Inner {
         private static final DConsoleManager sInstance = new DConsoleManager();
@@ -21,7 +18,7 @@ public class DConsoleManager {
         return DConsoleManager.Inner.sInstance;
     }
 
-    public void enableConsole(Boolean enable) {
+    public void enableConsole(boolean enable) {
         if (this.enable != enable) {
             this.enable = enable;
             Intent intent = new Intent("dConsoleEnableStateNotiName");

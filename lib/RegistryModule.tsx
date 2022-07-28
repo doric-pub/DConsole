@@ -12,7 +12,6 @@ import {
   layoutConfig,
   List,
   ListItem,
-  loge,
   SlideItem,
   Slider,
   Stack,
@@ -46,8 +45,17 @@ export class RegistryModule extends DCModule<number> {
     <VLayout parent={group} layoutConfig={layoutConfig().most()}>
       <Slider
         ref={this.sliderRef}
+        itemCount={0}
         layoutConfig={layoutConfig().mostWidth().justHeight().configWeight(1)}
         backgroundColor={Color.WHITE}
+        renderPage={(i) => {
+          return (
+            <SlideItem
+              layoutConfig={layoutConfig().most()}
+              identifier={"slide_cell"}
+            ></SlideItem>
+          ) as SlideItem;
+        }}
       ></Slider>
       <FlexLayout
         layoutConfig={layoutConfig()
@@ -190,7 +198,7 @@ export class RegistryModule extends DCModule<number> {
             : Color.LTGRAY,
       });
     });
-    
+
     this.btnTexts.forEach((t, index) => {
       if (index < this.datas.length) {
         var str = "";
@@ -218,7 +226,6 @@ export class RegistryModule extends DCModule<number> {
   }
 
   onBind(state: number): void {
-    loge(`1234565  onBind`)
     this.sliderRef.apply({
       itemCount: this.datas.length,
     });

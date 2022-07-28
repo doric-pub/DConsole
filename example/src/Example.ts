@@ -14,21 +14,14 @@ import {
   logw,
   navigator,
   hlayout,
-  Text,
-  notification,
 } from "doric";
-import {
-  dConsoleEnableStateNotiName,
-  dconsolePlugin,
-  openDConsole,
-} from "doric-console";
+import { openDConsole } from "doric-console";
 import { CounterDemo } from "./CounterDemo";
 import { demoPlugin } from "./DemoPlugin";
 import { GestureContainerDemo } from "./GestureContainerDemo";
 
 @Entry
 class Example extends Panel {
-  stateText?: Text;
   subscribeId?: string;
 
   onCreate() {
@@ -97,16 +90,6 @@ class Example extends Panel {
             padding: { left: 15, right: 15 },
             corners: 15,
           }),
-
-          (this.stateText = text({
-            text: "已关闭",
-            textSize: 18,
-            fontStyle: "bold",
-            height: 30,
-            layoutConfig: layoutConfig().fitWidth().justHeight(),
-            padding: { left: 15, right: 15 }
-          })),
-
           text({
             text: "关闭",
             textSize: 18,
@@ -122,7 +105,7 @@ class Example extends Panel {
           }),
         ],
         {
-          space: 5,
+          space: 30,
           height: 60,
           gravity: Gravity.CenterY,
           layoutConfig: layoutConfig()
@@ -141,35 +124,5 @@ class Example extends Panel {
         gravity: Gravity.Center,
       })
       .in(rootView);
-
-    dconsolePlugin(this.context)
-      .enableState()
-      .then((isEnable) => {
-        if (this.stateText !== undefined) {
-          this.stateText.text = isEnable ? "已打开" : "已关闭";
-        }
-      });
-
-    notification(context)
-      .subscribe({
-        name: dConsoleEnableStateNotiName,
-        callback: (data) => {
-          logw(`recieve notification: ${JSON.stringify(data)}`);
-          const isEnable = data.isEnable;
-          if (isEnable !== undefined && this.stateText !== undefined) {
-            this.stateText.text = isEnable ? "已打开" : "已关闭";
-          }
-        },
-      })
-      .then((subscribeId) => {
-        this.subscribeId = subscribeId;
-      });
-  }
-
-  onDestroy(): void {
-    if (this.subscribeId !== undefined) {
-      logw(`destroy notification: ${this.subscribeId}`);
-      notification(context).unsubscribe(this.subscribeId);
-    }
   }
 }

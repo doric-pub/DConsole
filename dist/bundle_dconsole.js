@@ -450,7 +450,9 @@ class RegistryModule extends DCModule {
     }
     build(group) {
         doric.jsx.createElement(doric.VLayout, { parent: group, layoutConfig: doric.layoutConfig().most() },
-            doric.jsx.createElement(doric.Slider, { ref: this.sliderRef, layoutConfig: doric.layoutConfig().mostWidth().justHeight().configWeight(1), backgroundColor: doric.Color.WHITE }),
+            doric.jsx.createElement(doric.Slider, { ref: this.sliderRef, itemCount: 0, layoutConfig: doric.layoutConfig().mostWidth().justHeight().configWeight(1), backgroundColor: doric.Color.WHITE, renderPage: (i) => {
+                    return (doric.jsx.createElement(doric.SlideItem, { layoutConfig: doric.layoutConfig().most(), identifier: "slide_cell" }));
+                } }),
             doric.jsx.createElement(doric.FlexLayout, { layoutConfig: doric.layoutConfig()
                     .mostWidth()
                     .justHeight()
@@ -555,7 +557,6 @@ class RegistryModule extends DCModule {
         }
     }
     onBind(state) {
-        doric.loge(`1234565  onBind`);
         this.sliderRef.apply({
             itemCount: this.datas.length,
         });
@@ -6883,7 +6884,7 @@ function openDConsole(context) {
                 callback: (data) => {
                     const isEnable = data.isEnable;
                     if (btnRef.current !== undefined) {
-                        btnRef.current.hidden = !!!isEnable;
+                        btnRef.current.hidden = !isEnable;
                     }
                 },
             })
@@ -6892,8 +6893,12 @@ function openDConsole(context) {
                     doric.notification(context).unsubscribe(subscribeId);
                 });
             });
-            dconsolePlugin(context).enableState().then((isEnable) => {
-                btnRef.current.hidden = !!!isEnable;
+            dconsolePlugin(context)
+                .enableState()
+                .then((isEnable) => {
+                if (btnRef.current !== undefined) {
+                    btnRef.current.hidden = !isEnable;
+                }
             });
         };
     });

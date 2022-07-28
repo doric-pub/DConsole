@@ -22,6 +22,7 @@ NSNotificationName const DConsoleEnableStateNotiName = @"dConsoleEnableStateNoti
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         manager = [[DConsoleManager alloc] init];
+        manager.enable = true;
     });
     return manager;
 }
