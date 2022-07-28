@@ -33,7 +33,7 @@ onCreate() {
 
 完成以上ts项目中的配置即可使用DConsole，如果需要在调试面板查看`libraries`、`plugins`、`nodes`， 则需要在iOS或者Andorid端进行以下配置。
 
-2. iOS端使用cocoapods引入 （**非必须**）
+2. iOS端使用cocoapods引入
 
 ```objc
 $ pod 'dConsole'
@@ -47,7 +47,7 @@ $ pod 'dConsole'
 [Doric registerLibrary:[dConsoleLibrary new]];
 ```
 
-3. Andorid端在app目录中的 build.gradle 中添加依赖（**非必须**）
+3. Andorid端在app目录中的 build.gradle 中添加依赖
 
 ```java
 dependencies {
@@ -63,6 +63,39 @@ import pub.doric.library.dConsoleLibrary;
 
 Doric.registerLibrary(new dConsoleLibrary());
 
+```
+
+4. 开启和关闭
+
+在native端开启或关闭DConsole的方法：
+
+iOS端:
+
+```objc
+#import "dConsoleLibrary.h"
+
+[[DConsoleManager instance] enableConsole:YES];  // 开启
+
+[[DConsoleManager instance] enableConsole:NO];  // 关闭
+```
+Andorid端:
+
+
+```java
+DConsoleManager.getInstance().enableConsole(true);  // 开启
+
+DConsoleManager.getInstance().enableConsole(false);  // 关闭
+```
+
+在js端获取开关状态：
+```js
+dconsolePlugin(context)
+      .enableState()
+      .then((isEnable) => {
+        if (this.stateText !== undefined) {
+          this.stateText.text = isEnable ? "已打开" : "已关闭";
+        }
+      });
 ```
 
 
@@ -81,7 +114,6 @@ Doric.registerLibrary(new dConsoleLibrary());
 可以通过底部的输入框执行一段执行Javascript语句，可调用Panel的function，比如以下一些js代码
 
 ```js
-this.getRootView().viewType()
 
 this.getRootView().viewId
 
