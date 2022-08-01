@@ -24,7 +24,7 @@ $ npm install doric-console --save
 在Panel的`onCreate()`回调方法里，通过`openDConsole(context: BridgeContext)`方法传入当前的`context`即可
 
 ```js
-import { openDConsole } from "dConsole";
+import { openDConsole } from "doric-console";
 
 onCreate() {
     openDConsole(this.context);
