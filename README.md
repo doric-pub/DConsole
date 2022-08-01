@@ -111,33 +111,25 @@ dconsolePlugin(context)
 
 * **Log**
 
-可以通过底部的输入框执行一段执行Javascript语句，可调用Panel的function，比如以下一些js代码
+可以通过底部的输入框执行一段执行Javascript语句，可调用当前Panel的function，比如可执行以下语句
 
 ```js
 
 this.getRootView().viewId
-
 this.getRootView().height
-
-this.getRootView().rotation = 0.5
-
-this.getRootView().rotation = 0
-
 this.getRootView().scaleX = 0.5
-
 this.getRootView().scaleX = 1
 ```
 
-
 | iOS | Android |
 | ---- | ---- |
-| !<img src="../main/images/log1.png" height="500px"/> | <img src="../main/images/log2.jpg" height="500px"/>|
+| <img src="../main/images/log1.png" height="500px"/> | <img src="../main/images/log2.jpg" height="500px"/>|
 
 * **Registry**
 
 | iOS | Android |
 | ---- | ---- |
-| !<img src="../main/images/plugin1.PNG" height="500px"/> | <img src="../main/images/plugin2.jpg" height="500px"/>|
+| <img src="../main/images/plugin1.PNG" height="500px"/> | <img src="../main/images/plugin2.jpg" height="500px"/>|
 
 * **State**
 
