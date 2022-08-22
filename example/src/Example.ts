@@ -60,6 +60,10 @@ class Example extends Panel {
         },
         layoutConfig: layoutConfig().fit(),
         padding: { left: 20, right: 20, top: 20, bottom: 20 },
+        border: {
+          width: 2,
+          color: Color.BLACK,
+        },
       }),
       text({
         text: "test StateModule",

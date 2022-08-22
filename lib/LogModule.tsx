@@ -15,6 +15,7 @@ import {
   Input,
 } from "doric";
 import { DCModule } from "./dcModule";
+import { separatorColor } from "./utils";
 
 type LogModel = { type: "d" | "w" | "e" | "q" | "a"; message: string }[];
 
@@ -48,7 +49,7 @@ export class LogModule extends DCModule<LogModel> {
         <Text
           layoutConfig={layoutConfig().mostHeight().fitWidth()}
           padding={{ left: 15, right: 15 }}
-          backgroundColor={Color.parse("#bdc3c7")}
+          backgroundColor={separatorColor}
           onClick={async () => {
             const text = await this.inputRef.current.getText(this.context);
             if (text?.length <= 0) {
@@ -116,7 +117,7 @@ export class LogModule extends DCModule<LogModel> {
         <ListItem layoutConfig={layoutConfig().mostWidth().fitHeight()}>
           <Text
             layoutConfig={layoutConfig().mostWidth().fitHeight()}
-            maxLines={-1}
+            maxLines={0}
             padding={{ left: 5, top: 5, right: 5, bottom: 5 }}
             textColor={(() => {
               switch (state[i].type) {
@@ -140,7 +141,7 @@ export class LogModule extends DCModule<LogModel> {
           <Stack
             layoutConfig={layoutConfig().mostWidth().justHeight()}
             height={0.5}
-            backgroundColor={Color.parse("#bdc3c7")}
+            backgroundColor={separatorColor}
           />
         </ListItem>
       ) as ListItem;

@@ -10,7 +10,7 @@
 
 详情可参考下方截图
 
-<img src="../main/images/element.gif" width="50%"/>
+<img src="../main/images/element1.mp4" width="50%"/>
 
 
 ### Usage
@@ -52,7 +52,7 @@ $ pod 'dConsole'
 ```java
 dependencies {
     ......
-    implementation "pub.doric:dconsole:0.1.5"
+    implementation "pub.doric:dconsole:0.1.6"
 }
 ```
 
@@ -111,7 +111,7 @@ dconsolePlugin(context)
 
 * **Log**
 
-可以通过底部的输入框执行一段执行Javascript语句，可调用当前Panel的function，比如可执行以下语句
+可以通过底部的输入框执行Javascript语句，可调用当前Panel的function，比如可执行以下语句
 
 ```js
 
@@ -124,6 +124,20 @@ this.getRootView().scaleX = 1
 | iOS | Android |
 | ---- | ---- |
 | <img src="../main/images/log1.png" height="500px"/> | <img src="../main/images/log2.jpg" height="500px"/>|
+
+
+* **Element**
+
+1. 控件的layoutConfig信息提前展示，比如（2 , 1）表示宽度most，高度为fit
+
+> 0 表示 just
+1 表示 fit
+2 表示 most
+
+2. 支持点击元素高亮显示控件
+
+<img src="../main/images/element2.PNG" width="50%"/>
+
 
 * **Registry**
 

@@ -21,6 +21,7 @@ import {
 import { DCModule } from "./dcModule";
 import { Map } from "immutable";
 import Immutable from "immutable";
+import { separatorColor } from "./utils";
 
 type StateModel = Map<string, any>[];
 
@@ -169,7 +170,7 @@ export class StateModule extends DCModule<StateModel> {
           >
             <Text
               layoutConfig={layoutConfig().mostWidth().fitHeight()}
-              maxLines={-1}
+              maxLines={0}
               padding={{ left: 5, top: 5, right: 5, bottom: 5 }}
               textAlignment={Gravity.CenterY.left()}
               textSize={12}
@@ -179,7 +180,7 @@ export class StateModule extends DCModule<StateModel> {
             <Stack
               layoutConfig={layoutConfig().mostWidth().justHeight()}
               height={0.5}
-              backgroundColor={Color.parse("#bdc3c7")}
+              backgroundColor={separatorColor}
             />
           </ListItem>
         ) as ListItem;

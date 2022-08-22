@@ -30,7 +30,7 @@ import { ElementModule } from "./ElementModule";
 import { LogModule } from "./LogModule";
 import { RegistryModule } from "./RegistryModule";
 import { StateModule } from "./StateModule";
-import { donConsoleNotiName, identifier } from "./utils";
+import { donConsoleNotiName, identifier, separatorColor } from "./utils";
 
 export const dConsoleEnableStateNotiName = "dConsoleEnableStateNotiName";
 
@@ -59,7 +59,7 @@ class DCVH extends ViewHolder {
       alpha={0.8}
       parent={root}
       layoutConfig={layoutConfig().most()}
-      backgroundColor={Color.parse("#bdc3c7")}
+      backgroundColor={separatorColor}
     >
       <VLayout
         layoutConfig={layoutConfig()

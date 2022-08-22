@@ -2,6 +2,7 @@ import {
   animate,
   Color,
   createRef,
+  GradientColor,
   Gravity,
   Group,
   HLayout,
@@ -9,6 +10,7 @@ import {
   layoutConfig,
   List,
   ListItem,
+  logw,
   NativeViewModel,
   notification,
   Panel,
@@ -18,6 +20,7 @@ import {
   Stack,
   Superview,
   Text,
+  TruncateAt,
   View,
   VLayout,
 } from "doric";
@@ -26,6 +29,7 @@ import {
   greenThemeColor,
   identifier,
   purpRedColor,
+  separatorColor,
 } from "./utils";
 import { DCModule } from "./dcModule";
 
@@ -36,6 +40,7 @@ type ElementModel = {
   unfold: boolean;
   displayChildren: string[];
   viewProperty: Object; // view的属性值
+  view?: View;
 };
 
 type Elements = ElementModel[];
@@ -80,7 +85,7 @@ export class ElementModule extends DCModule<Elements> {
       layoutConfig={layoutConfig().most()}
       backgroundColor={Color.WHITE}
       itemCount={2}
-      scrollable={true}
+      scrollable={false}
       renderPage={(index) => {
         if (index == 0) {
           return (
@@ -257,6 +262,7 @@ export class ElementModule extends DCModule<Elements> {
       unfold: true,
       displayChildren: [],
       viewProperty: Object.fromEntries(propMap),
+      view: view,
     };
     this.allElements.push(ele);
 
@@ -286,7 +292,7 @@ export class ElementModule extends DCModule<Elements> {
     }
   }
 
-  cellWith(element: ElementModel, index: number) {
+  cellWith(element: ElementModel) {
     const leftPadding = element.level * 10;
     const isHiddenArrow = element.displayChildren.length === 0;
     const arrowImage = (
@@ -302,17 +308,115 @@ export class ElementModule extends DCModule<Elements> {
         ▼
       </Text>
     );
+
+    var bgColor = Color.TRANSPARENT as Color | GradientColor;
+    if (element.view?.backgroundColor !== undefined) {
+      bgColor = element.view?.backgroundColor;
+    }
+    var text = "";
+    var fontStyle = "normal" as
+      | "normal"
+      | "bold"
+      | "italic"
+      | "bold_italic"
+      | undefined;
+    var textColor = Color.TRANSPARENT as Color | GradientColor | undefined;
+    if (element.view !== undefined && element.view instanceof Text) {
+      if (element.view.text != undefined) {
+        text = element.view.text;
+        textColor = element.view.textColor;
+        fontStyle = element.view.fontStyle;
+      }
+    }
+    var layoutString = "";
+    if (Reflect.has(element.viewProperty, "layoutConfig")) {
+      const layoutConfig = Reflect.get(element.viewProperty, "layoutConfig");
+      var widthSpec = 1;
+      var heightSpec = 1;
+      logw(`widthSpec: ${widthSpec}, heightSpec : ${heightSpec}`);
+      if (Reflect.has(layoutConfig, "widthSpec")) {
+        widthSpec = Reflect.get(layoutConfig, "widthSpec");
+      }
+      if (Reflect.has(layoutConfig, "heightSpec")) {
+        heightSpec = Reflect.get(layoutConfig, "heightSpec");
+      }
+      layoutString = `（${widthSpec} , ${heightSpec}）`;
+    }
+    const indicator = (
+      <Stack
+        layoutConfig={layoutConfig().just()}
+        width={40}
+        height={20}
+        backgroundColor={bgColor}
+        border={{
+          width: bgColor === Color.TRANSPARENT ? 0.5 : 0,
+          color: Color.BLACK,
+        }}
+        onClick={async () => {
+          if (!this.isAnimating &&  element !== undefined && element.view !== undefined) {
+            const border = element.view.border;
+            this.isAnimating = true;
+            await animate(this.context)({
+              animations: () => {
+                if (element.view !== undefined) {
+                  element.view.apply({
+                    border: {
+                      width: 5,
+                      color: Color.GREEN,
+                    },
+                  });
+                }
+              },
+              duration: 300,
+            });
+            setTimeout(() => {
+              animate(this.context)({
+                animations: () => {
+                  element.view?.apply({
+                    border:
+                      border === undefined
+                        ? {
+                            width: 0,
+                            color: Color.TRANSPARENT,
+                          }
+                        : border,
+                  });
+                },
+                duration: 100,
+              }).then(()=>{
+                this.isAnimating = false;
+              });
+            }, 600);
+          }
+        }}
+      >
+        <Text
+          layoutConfig={layoutConfig().most()}
+          maxLines={1}
+          textColor={textColor}
+          fontStyle={fontStyle}
+          backgroundColor={bgColor}
+          textAlignment={Gravity.Center}
+          truncateAt={TruncateAt.Clip}
+          textSize={11}
+          text={text}
+        ></Text>
+      </Stack>
+    );
     return (
       <ListItem
-        layoutConfig={layoutConfig().mostWidth().fitHeight()}
+        layoutConfig={layoutConfig().mostWidth().justHeight()}
+        backgroundColor={Color.WHITE}
+        height={30}
         identifier={"element_cell"}
         onClick={() => {
           this.displayElementDetail(element);
         }}
       >
         <HLayout
-          layoutConfig={layoutConfig().mostWidth().fitHeight()}
+          layoutConfig={layoutConfig().most()}
           gravity={Gravity.CenterY.left()}
+          padding={{ right: 10 }}
         >
           <Stack
             layoutConfig={layoutConfig().just()}
@@ -337,21 +441,46 @@ export class ElementModule extends DCModule<Elements> {
             {arrowImage}
           </Stack>
           <Text
-            layoutConfig={layoutConfig().mostWidth().fitHeight()}
-            maxLines={-1}
+            layoutConfig={layoutConfig().fit()}
+            maxLines={1}
             textColor={purpRedColor}
             fontStyle={"bold"}
-            padding={{ left: 0, top: 5, right: 5, bottom: 5 }}
+            backgroundColor={Color.WHITE}
             textAlignment={Gravity.CenterY.left()}
             textSize={12}
           >
             {element.data?.type}
           </Text>
+
+          <Text
+            layoutConfig={layoutConfig().fit().configMargin({ left: 5 })}
+            maxLines={1}
+            textColor={Color.BLACK}
+            backgroundColor={Color.WHITE}
+            textAlignment={Gravity.CenterY.left()}
+            textSize={10}
+          >
+            {layoutString}
+          </Text>
+
+          <Stack
+            layoutConfig={layoutConfig()
+              .justHeight()
+              .mostWidth()
+              .configWeight(1)}
+            height={26}
+            backgroundColor={Color.WHITE}
+          ></Stack>
+
+          {indicator}
         </HLayout>
         <Stack
-          layoutConfig={layoutConfig().mostWidth().justHeight()}
+          layoutConfig={layoutConfig()
+            .mostWidth()
+            .justHeight()
+            .configAlignment(Gravity.Bottom)}
           height={0.5}
-          backgroundColor={Color.parse("#bdc3c7")}
+          backgroundColor={separatorColor}
         />
       </ListItem>
     ) as ListItem;
@@ -376,7 +505,8 @@ export class ElementModule extends DCModule<Elements> {
           arr.push(value);
         }
         // "children" 数据太长，影响阅读，暂时不展示children、content、superview等信息
-        if (key === "children" || key === "content" || key === "superview") return;
+        if (key === "children" || key === "content" || key === "superview")
+          return;
         return value;
       },
       4
@@ -395,7 +525,7 @@ export class ElementModule extends DCModule<Elements> {
       itemCount: this._state.length,
       renderItem: (i) => {
         const element = this._state[i];
-        return this.cellWith(element, i);
+        return this.cellWith(element);
       },
     });
   }

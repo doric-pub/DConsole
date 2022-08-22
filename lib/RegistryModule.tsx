@@ -20,6 +20,7 @@ import {
 } from "doric";
 import { DCModule } from "./dcModule";
 import { dconsolePlugin } from "./DConsolePlugin";
+import { separatorColor } from "./utils";
 
 export class RegistryModule extends DCModule<number> {
   listRef = createRef<List>();
@@ -162,7 +163,7 @@ export class RegistryModule extends DCModule<number> {
                   >
                     <Text
                       layoutConfig={layoutConfig().mostWidth().fitHeight()}
-                      maxLines={-1}
+                      maxLines={0}
                       textColor={Color.BLACK}
                       padding={{ left: 10, top: 8, right: 5, bottom: 8 }}
                       textAlignment={Gravity.CenterY.left()}
@@ -173,7 +174,7 @@ export class RegistryModule extends DCModule<number> {
                     <Stack
                       layoutConfig={layoutConfig().mostWidth().justHeight()}
                       height={0.5}
-                      backgroundColor={Color.parse("#bdc3c7")}
+                      backgroundColor={separatorColor}
                     />
                   </ListItem>
                 ) as ListItem;

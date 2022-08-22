@@ -25,6 +25,7 @@ const identifier = "dConsole";
 const donConsoleNotiName = "dConsoleNotiName";
 const purpRedColor = doric.Color.parse("#D608D6");
 const greenThemeColor = doric.Color.parse("#2ecc71");
+const separatorColor = doric.Color.parse("#bdc3c7");
 [
     "#70a1ff",
     "#7bed9f",
@@ -90,7 +91,7 @@ class ElementModule extends DCModule {
             return;
         this.realGroup.removeAllChildren();
         const list = (doric.jsx.createElement(doric.List, { ref: this.listRef, layoutConfig: doric.layoutConfig().most() }));
-        doric.jsx.createElement(doric.Slider, { ref: this.sliderRef, parent: this.realGroup, layoutConfig: doric.layoutConfig().most(), backgroundColor: doric.Color.WHITE, itemCount: 2, scrollable: true, renderPage: (index) => {
+        doric.jsx.createElement(doric.Slider, { ref: this.sliderRef, parent: this.realGroup, layoutConfig: doric.layoutConfig().most(), backgroundColor: doric.Color.WHITE, itemCount: 2, scrollable: false, renderPage: (index) => {
                 if (index == 0) {
                     return (doric.jsx.createElement(doric.SlideItem, { layoutConfig: doric.layoutConfig().most(), identifier: "menu_cell" }, list));
                 }
@@ -218,6 +219,7 @@ class ElementModule extends DCModule {
             unfold: true,
             displayChildren: [],
             viewProperty: Object.fromEntries(propMap),
+            view: view,
         };
         this.allElements.push(ele);
         if (view instanceof doric.Group) {
@@ -246,18 +248,87 @@ class ElementModule extends DCModule {
             }
         }
     }
-    cellWith(element, index) {
-        var _a;
+    cellWith(element) {
+        var _a, _b, _c;
         const leftPadding = element.level * 10;
         const isHiddenArrow = element.displayChildren.length === 0;
         const arrowImage = (doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig()
                 .fit()
                 .configAlignment(doric.Gravity.Center)
                 .configMargin({ right: -4 }), hidden: isHiddenArrow, textSize: 10, rotation: element.unfold ? 2 : 1.5 }, "\u25BC"));
-        return (doric.jsx.createElement(doric.ListItem, { layoutConfig: doric.layoutConfig().mostWidth().fitHeight(), identifier: "element_cell", onClick: () => {
+        var bgColor = doric.Color.TRANSPARENT;
+        if (((_a = element.view) === null || _a === void 0 ? void 0 : _a.backgroundColor) !== undefined) {
+            bgColor = (_b = element.view) === null || _b === void 0 ? void 0 : _b.backgroundColor;
+        }
+        var text = "";
+        var fontStyle = "normal";
+        var textColor = doric.Color.TRANSPARENT;
+        if (element.view !== undefined && element.view instanceof doric.Text) {
+            if (element.view.text != undefined) {
+                text = element.view.text;
+                textColor = element.view.textColor;
+                fontStyle = element.view.fontStyle;
+            }
+        }
+        var layoutString = "";
+        if (Reflect.has(element.viewProperty, "layoutConfig")) {
+            const layoutConfig = Reflect.get(element.viewProperty, "layoutConfig");
+            var widthSpec = 1;
+            var heightSpec = 1;
+            doric.logw(`widthSpec: ${widthSpec}, heightSpec : ${heightSpec}`);
+            if (Reflect.has(layoutConfig, "widthSpec")) {
+                widthSpec = Reflect.get(layoutConfig, "widthSpec");
+            }
+            if (Reflect.has(layoutConfig, "heightSpec")) {
+                heightSpec = Reflect.get(layoutConfig, "heightSpec");
+            }
+            layoutString = `（${widthSpec} , ${heightSpec}）`;
+        }
+        const indicator = (doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig().just(), width: 40, height: 20, backgroundColor: bgColor, border: {
+                width: bgColor === doric.Color.TRANSPARENT ? 0.5 : 0,
+                color: doric.Color.BLACK,
+            }, onClick: () => __awaiter$3(this, void 0, void 0, function* () {
+                if (!this.isAnimating && element !== undefined && element.view !== undefined) {
+                    const border = element.view.border;
+                    this.isAnimating = true;
+                    yield doric.animate(this.context)({
+                        animations: () => {
+                            if (element.view !== undefined) {
+                                element.view.apply({
+                                    border: {
+                                        width: 5,
+                                        color: doric.Color.GREEN,
+                                    },
+                                });
+                            }
+                        },
+                        duration: 300,
+                    });
+                    setTimeout(() => {
+                        doric.animate(this.context)({
+                            animations: () => {
+                                var _a;
+                                (_a = element.view) === null || _a === void 0 ? void 0 : _a.apply({
+                                    border: border === undefined
+                                        ? {
+                                            width: 0,
+                                            color: doric.Color.TRANSPARENT,
+                                        }
+                                        : border,
+                                });
+                            },
+                            duration: 100,
+                        }).then(() => {
+                            this.isAnimating = false;
+                        });
+                    }, 600);
+                }
+            }) },
+            doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().most(), maxLines: 1, textColor: textColor, fontStyle: fontStyle, backgroundColor: bgColor, textAlignment: doric.Gravity.Center, truncateAt: doric.TruncateAt.Clip, textSize: 11, text: text })));
+        return (doric.jsx.createElement(doric.ListItem, { layoutConfig: doric.layoutConfig().mostWidth().justHeight(), backgroundColor: doric.Color.WHITE, height: 30, identifier: "element_cell", onClick: () => {
                 this.displayElementDetail(element);
             } },
-            doric.jsx.createElement(doric.HLayout, { layoutConfig: doric.layoutConfig().mostWidth().fitHeight(), gravity: doric.Gravity.CenterY.left() },
+            doric.jsx.createElement(doric.HLayout, { layoutConfig: doric.layoutConfig().most(), gravity: doric.Gravity.CenterY.left(), padding: { right: 10 } },
                 doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig().just(), width: 24, height: 26, left: leftPadding, onClick: () => __awaiter$3(this, void 0, void 0, function* () {
                         if (!this.isAnimating && arrowImage.hidden === false) {
                             this.isAnimating = true;
@@ -272,8 +343,17 @@ class ElementModule extends DCModule {
                             this.isAnimating = false;
                         }
                     }) }, arrowImage),
-                doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().mostWidth().fitHeight(), maxLines: -1, textColor: purpRedColor, fontStyle: "bold", padding: { left: 0, top: 5, right: 5, bottom: 5 }, textAlignment: doric.Gravity.CenterY.left(), textSize: 12 }, (_a = element.data) === null || _a === void 0 ? void 0 : _a.type)),
-            doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig().mostWidth().justHeight(), height: 0.5, backgroundColor: doric.Color.parse("#bdc3c7") })));
+                doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().fit(), maxLines: 1, textColor: purpRedColor, fontStyle: "bold", backgroundColor: doric.Color.WHITE, textAlignment: doric.Gravity.CenterY.left(), textSize: 12 }, (_c = element.data) === null || _c === void 0 ? void 0 : _c.type),
+                doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().fit().configMargin({ left: 5 }), maxLines: 1, textColor: doric.Color.BLACK, backgroundColor: doric.Color.WHITE, textAlignment: doric.Gravity.CenterY.left(), textSize: 10 }, layoutString),
+                doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig()
+                        .justHeight()
+                        .mostWidth()
+                        .configWeight(1), height: 26, backgroundColor: doric.Color.WHITE }),
+                indicator),
+            doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig()
+                    .mostWidth()
+                    .justHeight()
+                    .configAlignment(doric.Gravity.Bottom), height: 0.5, backgroundColor: separatorColor })));
     }
     displayElementDetail(element) {
         this.detailElement = element;
@@ -308,7 +388,7 @@ class ElementModule extends DCModule {
             itemCount: this._state.length,
             renderItem: (i) => {
                 const element = this._state[i];
-                return this.cellWith(element, i);
+                return this.cellWith(element);
             },
         });
     }
@@ -340,7 +420,7 @@ class LogModule extends DCModule {
             doric.jsx.createElement(doric.List, { ref: this.listRef, layoutConfig: doric.layoutConfig().mostWidth().justHeight().configWeight(1) }),
             doric.jsx.createElement(doric.HLayout, { layoutConfig: doric.layoutConfig().mostWidth().justHeight(), height: 50, gravity: doric.Gravity.CenterY, padding: { left: 15, right: 15 } },
                 doric.jsx.createElement(doric.Input, { ref: this.inputRef, layoutConfig: doric.layoutConfig().mostHeight().justWidth().configWeight(2), backgroundColor: doric.Color.parse("#ecf0f1"), textAlignment: doric.Gravity.CenterY.left() }),
-                doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().mostHeight().fitWidth(), padding: { left: 15, right: 15 }, backgroundColor: doric.Color.parse("#bdc3c7"), onClick: () => __awaiter$2(this, void 0, void 0, function* () {
+                doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().mostHeight().fitWidth(), padding: { left: 15, right: 15 }, backgroundColor: separatorColor, onClick: () => __awaiter$2(this, void 0, void 0, function* () {
                         const text = yield this.inputRef.current.getText(this.context);
                         if ((text === null || text === void 0 ? void 0 : text.length) <= 0) {
                             return;
@@ -396,7 +476,7 @@ class LogModule extends DCModule {
         };
         this.listRef.current.renderItem = (i) => {
             return (doric.jsx.createElement(doric.ListItem, { layoutConfig: doric.layoutConfig().mostWidth().fitHeight() },
-                doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().mostWidth().fitHeight(), maxLines: -1, padding: { left: 5, top: 5, right: 5, bottom: 5 }, textColor: (() => {
+                doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().mostWidth().fitHeight(), maxLines: 0, padding: { left: 5, top: 5, right: 5, bottom: 5 }, textColor: (() => {
                         switch (state[i].type) {
                             case "e":
                                 return doric.Color.parse("#e74c3c");
@@ -410,7 +490,7 @@ class LogModule extends DCModule {
                                 return doric.Color.BLACK;
                         }
                     })(), textAlignment: doric.Gravity.CenterY.left(), textSize: 12 }, state[i].message),
-                doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig().mostWidth().justHeight(), height: 0.5, backgroundColor: doric.Color.parse("#bdc3c7") })));
+                doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig().mostWidth().justHeight(), height: 0.5, backgroundColor: separatorColor })));
         };
     }
     onBind(state) {
@@ -511,8 +591,8 @@ class RegistryModule extends DCModule {
                     doric.jsx.createElement(doric.List, { layoutConfig: doric.layoutConfig().mostWidth().mostHeight(), itemCount: this.datas[index].length, renderItem: (i) => {
                             const desc = this.datas[index][i];
                             return (doric.jsx.createElement(doric.ListItem, { layoutConfig: doric.layoutConfig().mostWidth().fitHeight(), identifier: "node_cell" },
-                                doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().mostWidth().fitHeight(), maxLines: -1, textColor: doric.Color.BLACK, padding: { left: 10, top: 8, right: 5, bottom: 8 }, textAlignment: doric.Gravity.CenterY.left(), textSize: 13 }, desc),
-                                doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig().mostWidth().justHeight(), height: 0.5, backgroundColor: doric.Color.parse("#bdc3c7") })));
+                                doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().mostWidth().fitHeight(), maxLines: 0, textColor: doric.Color.BLACK, padding: { left: 10, top: 8, right: 5, bottom: 8 }, textAlignment: doric.Gravity.CenterY.left(), textSize: 13 }, desc),
+                                doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig().mostWidth().justHeight(), height: 0.5, backgroundColor: separatorColor })));
                         } })));
             },
             onPageSlided: (index) => {
@@ -6673,8 +6753,8 @@ class StateModule extends DCModule {
                 if (!model)
                     return (doric.jsx.createElement(doric.ListItem, null));
                 return (doric.jsx.createElement(doric.ListItem, { layoutConfig: doric.layoutConfig().mostWidth().fitHeight(), identifier: "state_cell" },
-                    doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().mostWidth().fitHeight(), maxLines: -1, padding: { left: 5, top: 5, right: 5, bottom: 5 }, textAlignment: doric.Gravity.CenterY.left(), textSize: 12 }, `${model.get("action")}: ${JSON.stringify(model.get("value"))}`),
-                    doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig().mostWidth().justHeight(), height: 0.5, backgroundColor: doric.Color.parse("#bdc3c7") })));
+                    doric.jsx.createElement(doric.Text, { layoutConfig: doric.layoutConfig().mostWidth().fitHeight(), maxLines: 0, padding: { left: 5, top: 5, right: 5, bottom: 5 }, textAlignment: doric.Gravity.CenterY.left(), textSize: 12 }, `${model.get("action")}: ${JSON.stringify(model.get("value"))}`),
+                    doric.jsx.createElement(doric.Stack, { layoutConfig: doric.layoutConfig().mostWidth().justHeight(), height: 0.5, backgroundColor: separatorColor })));
             },
         });
         if (this.history.length > 0) {
@@ -6721,7 +6801,7 @@ class DCVH extends doric.ViewHolder {
         this.contentRef = doric.createRef();
     }
     build(root) {
-        doric.jsx.createElement(doric.Stack, { ref: this.containerRef, tag: identifier, hidden: true, alpha: 0.8, parent: root, layoutConfig: doric.layoutConfig().most(), backgroundColor: doric.Color.parse("#bdc3c7") },
+        doric.jsx.createElement(doric.Stack, { ref: this.containerRef, tag: identifier, hidden: true, alpha: 0.8, parent: root, layoutConfig: doric.layoutConfig().most(), backgroundColor: separatorColor },
             doric.jsx.createElement(doric.VLayout, { layoutConfig: doric.layoutConfig()
                     .mostWidth()
                     .fitHeight()
