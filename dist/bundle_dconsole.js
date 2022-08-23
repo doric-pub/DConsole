@@ -288,7 +288,13 @@ class ElementModule extends DCModule {
                 width: bgColor === doric.Color.TRANSPARENT ? 0.5 : 0,
                 color: doric.Color.BLACK,
             }, onClick: () => __awaiter$3(this, void 0, void 0, function* () {
-                if (!this.isAnimating && element !== undefined && element.view !== undefined) {
+                if (!this.isAnimating &&
+                    element !== undefined &&
+                    element.view !== undefined) {
+                    if (Environment.platform === "Android" &&
+                        element.view instanceof doric.Root) {
+                        return;
+                    }
                     const border = element.view.border;
                     this.isAnimating = true;
                     yield doric.animate(this.context)({

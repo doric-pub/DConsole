@@ -10,7 +10,7 @@
 
 详情可参考下方截图
 
-<img src="../main/images/element1.mp4" width="50%"/>
+<img src="../main/images/element.gif" width="50%"/>
 
 
 ### Usage
@@ -103,7 +103,7 @@ dconsolePlugin(context)
 
 ```js
 "peerDependencies": {
-      "doric": "^0.10.16",
+      "doric": "^0.10.22",
 },
 ```
 
@@ -130,9 +130,7 @@ this.getRootView().scaleX = 1
 
 1. 控件的layoutConfig信息提前展示，比如（2 , 1）表示宽度most，高度为fit
 
-> 0 表示 just
-1 表示 fit
-2 表示 most
+> 0 表示 just    1 表示 fit     2 表示 most
 
 2. 支持点击元素高亮显示控件
 

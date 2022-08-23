@@ -14,6 +14,7 @@ import {
   NativeViewModel,
   notification,
   Panel,
+  Root,
   Scroller,
   SlideItem,
   Slider,
@@ -353,7 +354,17 @@ export class ElementModule extends DCModule<Elements> {
           color: Color.BLACK,
         }}
         onClick={async () => {
-          if (!this.isAnimating &&  element !== undefined && element.view !== undefined) {
+          if (
+            !this.isAnimating &&
+            element !== undefined &&
+            element.view !== undefined
+          ) {
+            if (
+              Environment.platform === "Android" &&
+              element.view instanceof Root
+            ) {
+              return;
+            }
             const border = element.view.border;
             this.isAnimating = true;
             await animate(this.context)({
@@ -383,7 +394,7 @@ export class ElementModule extends DCModule<Elements> {
                   });
                 },
                 duration: 100,
-              }).then(()=>{
+              }).then(() => {
                 this.isAnimating = false;
               });
             }, 600);
